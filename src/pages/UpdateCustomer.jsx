@@ -54,7 +54,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
                 alt="imgForm"
               />
               <h1 className="text-[20px] font-[600]">
-                Chỉnh Sửa Thông Tin Giáo Viên
+                Chỉnh Sửa Thông Tin Giáo Viênnnn
               </h1>
             </div>
           </div>
