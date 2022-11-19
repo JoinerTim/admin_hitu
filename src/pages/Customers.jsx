@@ -33,7 +33,7 @@ const DashboardUsers = () => {
 
   const handleDeleteUser = async (row) => {
     try {
-      await dispatch(deleteSingleUser(row._id)).unwrap();
+      await dispatch(deleteSingleUser(row.id)).unwrap();
       setKeyFresh((oldv) => oldv + 1);
       toast.success("Người dùng vừa được xóa thành công");
       setCountSelected(0);

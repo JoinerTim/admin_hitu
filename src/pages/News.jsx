@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
 
 import { getListNews } from '../redux/toolskit/newsSlice'
+import UpdateNews from './UpdateNews';
+
 
 // import { ScheduleComponent, ViewsDirective, ViewDirective, Day, Week, WorkWeek, Month, Agenda, Inject, Resize, DragAndDrop } from '@syncfusion/ej2-react-schedule';
 // import { DatePickerComponent } from '@syncfusion/ej2-react-calendars';
@@ -14,11 +16,31 @@ const News = () =>{
   
   const dispatch = useDispatch();
   const history = useNavigate();
+
+  const [keyFresh, setKeyFresh] = useState(0);
+  const [countSelected, setCountSelected] = useState(0);
+  const [arrayId, setArrayId] = useState([]);
+
+  const [updateShow, setUpdateShow] = useState(false)
+  const [newsId, setNewsId] = useState(null)
+
   const getData = async () => {
     const data = await dispatch(getListNews({page:1, size:10}));
     console.log(data.payload);
     setNews(data.payload);
 }
+
+const handleDeleteNews = async (row) => {
+  try {
+    await dispatch((row.id)).unwrap();
+    setKeyFresh((oldv) => oldv + 1);
+    toast.success("Tin tức vừa được xóa thành công");
+    setCountSelected(0);
+  } catch (error) {
+    toast.error("Tin tức chưa được xóa!");
+  }
+};
+
 const columns = [
   {
     name: "Id",
@@ -72,27 +94,27 @@ const columns = [
   {
     name: "Actions",
     selector: (row) => (
-      <div className="action--item flex align-center">
+      <div className="action--item">
         <button
-          className="btn"
+          className="btn-action update-handle"
           onClick={() => {
-            history(`/dashboard/update/user/${row.id}`);
+            // history(`/dashboard/update/user/${row.id}`);
+            setUpdateShow(true)
+            setNewsId(row.userId)
           }}
         >
           Sửa
         </button>
-        <hr/>
         <button
-          className="btn"
+          className="btn-action delete-handle"
           onClick={() => {
-            // handleDeleteUser(row);
+            handleDeleteNews(row);
           }}
         >
           Xóa
         </button>
       </div>
     ),
-    width:"300px"
   },
 ];
   useEffect(
@@ -128,6 +150,7 @@ const columns = [
         // </DataTableExtensions>
       }
       {/* {loading && <Loader />} */}
+      <UpdateNews updateShow={updateShow} setUpdateShow={setUpdateShow} newsId={newsId} setNewsId={setNewsId}/>
     </div>
   );
 }

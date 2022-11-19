@@ -33,7 +33,6 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
     setUserId(null);
     confirmRef.current.classList.remove("show");
     setUpdateShow(!updateShow);
-    console.log("nam yeu lon nhieu lam!");
   };
 
   const handleSubmit = (e) => {
