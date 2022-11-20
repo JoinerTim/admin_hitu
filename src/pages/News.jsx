@@ -42,14 +42,14 @@ const handleDeleteNews = async (row) => {
 };
 
 const columns = [
-  {
-    name: "Id",
-    selector: (row) => row.id,
-    width:"50px"
-  },
+  // {
+  //   name: "Id",
+  //   selector: (row) => row.id,
+  //   width:"50px"
+  // },
   {
     name: "Ngày Tạo",
-    selector: (row) => row.createdDate,
+    selector: (row) => row.createdDate.slice(0,10),
     sortable: true,
     width:"250px"
   },
@@ -100,7 +100,7 @@ const columns = [
           onClick={() => {
             // history(`/dashboard/update/user/${row.id}`);
             setUpdateShow(true)
-            setNewsId(row.userId)
+            setNewsId(row.id)
           }}
         >
           Sửa

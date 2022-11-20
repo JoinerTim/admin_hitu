@@ -4,6 +4,12 @@ const TeacherAPI = {
     const url = "/api/v1/teachers";
     return axiosClient.post(url, obj);
   },
+  putUpdateTeacher(obj) {
+    const url = "/api/v1/teachers";
+    return axiosClient.put(url);
+  },
+
+
   async getTeacherListAPI(page,size) {
     const url = `v1/teachers/page?page=${page}&size=${size}`;
     return await axiosClient.get(url);
