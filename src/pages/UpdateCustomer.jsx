@@ -11,10 +11,18 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
 
   const [message,setMessenger] = useState('');
   const [obj,setObj] = useState({
-    name:teacher.name,
-    address:teacher.address,
-    email:teacher.email,
-    phone:teacher.phone
+    address: teacher.address,
+    dob: teacher.dob,
+    email: teacher.email,
+    facultyCode: teacher.facultyCode,
+    gender: teacher.gender,
+    id: teacher.id,
+    manager: teacher.manager,
+    name: teacher.name,
+    password: teacher.password,
+    phone: teacher.phone,
+    remark: teacher.remark,
+    roleCodes: teacher.role,
   })
 
   const getTeacherData = async (userId) => {
@@ -53,7 +61,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
   };
   const handleChange = (e) => {
 
-    let value= e.target.value;
+    let value = e.target.value;
     let name = e.target.name;
     
     setObj((prevalue) => {
@@ -72,10 +80,23 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
       let res = await fetch("http://18.140.66.234/api/v1/teachers",{
         method:"PUT",
         body:JSON.stringify({
-          name:obj.name,
-          email:obj.email,
-          phone:obj.phone,
-          address:obj.address
+          // name:obj.name,
+          // email:obj.email,
+          // phone:obj.phone,
+          // address:obj.address
+          address: obj.address,
+          dob: obj.dob,
+          email: obj.email,
+          facultyCode: obj.facultyCode,
+          gender: obj.gender,
+          id: teacher.id,
+          manager: obj.manager,
+          name: obj.name,
+          password: obj.password,
+          phone: obj.phone,
+          remark: obj.remark,
+          roleCodes: obj.roleCodes
+          ,
         }),
       });
       let resJson = await res.json();
