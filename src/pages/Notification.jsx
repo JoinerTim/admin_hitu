@@ -1,24 +1,123 @@
-import React from 'react';
-import { KanbanComponent, ColumnsDirective, ColumnDirective } from '@syncfusion/ej2-react-kanban';
+import React, { useState, useEffect } from 'react';
+import {useDispatch} from 'react-redux';
+import { toast } from "react-toastify";
+import DataTable from "react-data-table-component";
 
-import { kanbanData, kanbanGrid } from '../data/dummy';
-import { Header } from '../components';
+import { getListNotification } from '../redux/toolskit/notificationSlice.js'
+import UpdateNotification from './UpdateNotification';
 
-const Notification = () => (
-  <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-    <Header category="App" title="Kanban" />
-    <KanbanComponent
-      id="kanban"
-      keyField="Status"
-      dataSource={kanbanData}
-      cardSettings={{ contentField: 'Summary', headerField: 'Id' }}
-    >
-      <ColumnsDirective>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        {kanbanGrid.map((item, index) => <ColumnDirective key={index} {...item} />)}
-      </ColumnsDirective>
-    </KanbanComponent>
-  </div>
-);
+const Notification = () =>{
+  const [notification, setNotification] = useState([]);
+  
+  const dispatch = useDispatch();
+
+  const [keyFresh, setKeyFresh] = useState(0);
+  const [countSelected, setCountSelected] = useState(0);
+  const [arrayId, setArrayId] = useState([]);
+
+  const [updateShow, setUpdateShow] = useState(false)
+  const [notificationId, setNotificationId] = useState(null)
+
+  const getData = async () => {
+    const data = await dispatch(getListNotification({page:1, size:10}));
+    console.log(data.payload);
+    setNotification(data.payload);
+}
+
+const handleDeleteNotification = async (row) => {
+  try {
+    await dispatch((row.id)).unwrap();
+    setKeyFresh((oldv) => oldv + 1);
+    toast.success("Tin tức vừa được xóa thành công");
+    setCountSelected(0);
+  } catch (error) {
+    toast.error("Tin tức chưa được xóa!");
+  }
+};
+
+const columns = [
+  {
+    name: "Ngày Tạo",
+    selector: (row) => row.createdDate.slice(0,10),
+    sortable: true,
+    width:"250px"
+  },
+  {
+    name: "Tác Giả",
+    selector: (row) => row.createdBy,
+    sortable: true,
+    width:"100px"
+  },
+  {
+    name: "Title",
+    selector: (row) => row.title,
+    sortable: true,
+    width:"200px"
+  },
+  {
+    name: "ShortDescription",
+    selector: (row) => row.shortDescription,
+    sortable: true,
+    width:"500px"
+  },
+  {
+    name: "Actions",
+    selector: (row) => (
+      <div className="action--item">
+        <button
+          className="btn-action update-handle"
+          onClick={() => {
+            setUpdateShow(true)
+            setNotificationId(row.id)
+          }}
+        >
+          Sửa
+        </button>
+        <button
+          className="btn-action delete-handle"
+          onClick={() => {
+            handleDeleteNotification(row);
+          }}
+        >
+          Xóa
+        </button>
+      </div>
+    ),
+  },
+];
+  useEffect(
+    ()=>{
+      getData()
+    },[keyFresh]
+  )
+  return (
+    <div className="col l-10 m-[30px_50px]">
+      {
+        <DataTable
+          title="Danh sách tin tức"
+          columns={columns}
+          data={notification}
+          pagination
+          fixedHeader
+          fixedHeaderScrollHeight="400px"
+          selectableRows
+          selectableRowsHighlight={false}
+          // onSelectedRowsChange={handleSelectedChange}
+          actions={
+            <div>
+              <button className="btn" onClick="">
+                Xóa (
+                  {/* {countSelected} */}
+                  ){" "}
+              </button>
+            </div>
+          }
+          dense
+        />
+      }
+      <UpdateNotification updateShow={updateShow} setUpdateShow={setUpdateShow} notificationId={notificationId} setNotificationId={setNotificationId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+    </div>
+  );
+}
 
 export default Notification;

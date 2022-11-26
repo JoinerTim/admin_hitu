@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import API from '../../API/NewsAPI';
-import API_NOTI from '../../API/NotificationAPI';
+import API from '../../API/NotificationAPI';
 
 
 const initialState = {
@@ -9,30 +8,12 @@ const initialState = {
   error: undefined,
 };
 
-//---------------------------------NEWS---------------------------------------//
-
-export const getListNews = createAsyncThunk(
-    "users_admin/list_news",
-    async (payload, thunkApi) => {
-      const {data} = await API.getListNewsAPI(payload.page, payload.size);
-      return data.data;
-    }
-  );
-  
-export const getPageNews = createAsyncThunk(
-"users_admin/page_news",
-async (payload, thunkApi) => {
-    const {data} = await API.getPageNewsAPI(payload.page, payload.size);
-    return data.data;
-}
-);
-
 //---------------------------------NOTIFICATION---------------------------------------//
 
 export const getListNotification = createAsyncThunk(
   "users_admin/list_notification",
   async (payload, thunkApi) => {
-    const {data} = await API_NOTI.getListNotification(payload.page, payload.size);
+    const {data} = await API.getListNotification(payload.page, payload.size);
     return data.data;
   }
 );
@@ -40,7 +21,7 @@ export const getListNotification = createAsyncThunk(
 export const getPageNotification = createAsyncThunk(
 "users_admin/page_notification",
 async (payload, thunkApi) => {
-  const {data} = await API_NOTI.getPageNotification(payload.page, payload.size);
+  const {data} = await API.getPageNotification(payload.page, payload.size);
   return data.data;
 }
 );

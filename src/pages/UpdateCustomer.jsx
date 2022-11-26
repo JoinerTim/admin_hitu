@@ -34,10 +34,10 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
   const getTeacherData = async (userId) => {
     const {data: {address, dob, email, facultyCode, gender, id, manager, name, password, phone, remark, roleCodes}} = await TeacherAPI.getSingleTeacher(userId);
     setObj({...obj, address, dob, email, facultyCode, gender, id, manager, name, password, phone, remark, roleCodes, userId})
-    setObj((old) => {
-      const constpass = {...old, password:"111111"}
-      return constpass
-    })
+    // setObj((old) => {
+    //   const constpass = {...old, password:"111111"}
+    //   return constpass
+    // })
     console.log(obj);
   };
  
@@ -64,21 +64,11 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
     confirmRef.current.classList.remove("show");
     setUpdateShow(!updateShow);
   };
-  const handleChange = (e) => {
+  // const handleChange = (e) => {
 
-    let value = e.target.value;
-    let name = e.target.name;
-    
-    // setObj((prevalue) => {
-    //   return {
-    //     ...prevalue,
-    //     [name]: value
-    //   }
-    // });
-
-
-    
-  }
+  //   let value = e.target.value;
+  //   let name = e.target.name;
+  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

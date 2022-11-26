@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import NewsAPI from "../API/NewsAPI";
-import "./UpdateNews.scss";
+import "./UpdateNotification.scss";
 import updateFormImg from "../assests/updateForm.png";
 import { toast } from "react-toastify";
 
