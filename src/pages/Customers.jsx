@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from 'react';
-// import { GridComponent, ColumnsDirective, ColumnDirective, Page, Selection, Inject, Edit, Toolbar, Sort, Filter } from '@syncfusion/ej2-react-grids';
 import {useDispatch, useSelector} from 'react-redux';
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import "./Customers.scss";
 import {getListTeacherPerPage, deleteSingleUser, deleteMutipleUser} from '../redux/toolskit/userSlice'
@@ -10,8 +8,6 @@ import UpdateCustomer from './UpdateCustomer';
 
 const DashboardUsers = () => {
   const dispatch = useDispatch();
-  const history = useNavigate();
-  // const [isLoading, setIsLoading] = useState(false);
 
   const {data: users} = useSelector(state => state.userState)
 
@@ -100,10 +96,10 @@ const DashboardUsers = () => {
     },
   ];
 
-  const tableData = {
-    columns,
-    data: users,
-  };
+  // const tableData = {
+  //   columns,
+  //   data: users,
+  // };
 
   const handleSelectedChange = (state) => {
     setCountSelected(state.selectedCount);
@@ -150,7 +146,7 @@ const DashboardUsers = () => {
         />
         // </DataTableExtensions>
       }
-      <UpdateCustomer updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId}/>
+      <UpdateCustomer updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
     </div>
   );
 };

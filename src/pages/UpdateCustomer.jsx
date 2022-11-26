@@ -2,45 +2,50 @@ import React, { useRef, useEffect, useState } from "react";
 import TeacherAPI from "../API/TeacherAPI";
 import "./UpdateCustomer.scss";
 import updateFormImg from "../assests/updateForm.png";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
+const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh, setKeyFresh }) => {
   const confirmRef = useRef();
 
+  
   const [teacher, setTeacher] = useState({});
   const [activeInput, setActiveInput] = useState(null);
 
   const [message,setMessenger] = useState('');
+  
   const [obj,setObj] = useState({
-    address: teacher.address,
-    dob: teacher.dob,
-    email: teacher.email,
-    facultyCode: teacher.facultyCode,
-    gender: teacher.gender,
-    id: teacher.id,
-    manager: teacher.manager,
-    name: teacher.name,
-    password: teacher.password,
-    phone: teacher.phone,
-    remark: teacher.remark,
-    roleCodes: teacher.role,
+    address: "",
+    dob: "",
+    email: "",
+    facultyCode: "",
+    gender: "",
+    id: "",
+    manager: "",
+    name: "",
+    password: "",
+    phone: "",
+    remark: "",
+    roleCodes: [],
+    userId: "",
   })
 
+
   const getTeacherData = async (userId) => {
-    const { data } = await TeacherAPI.getSingleTeacher(userId);
-    console.log(data);
-    setTeacher(data);
+    const {data: {address, dob, email, facultyCode, gender, id, manager, name, password, phone, remark, roleCodes}} = await TeacherAPI.getSingleTeacher(userId);
+    setObj({...obj, address, dob, email, facultyCode, gender, id, manager, name, password, phone, remark, roleCodes, userId})
+    setObj((old) => {
+      const constpass = {...old, password:"111111"}
+      return constpass
+    })
+    console.log(obj);
   };
-
-  // const updateTeacherData = async (userId) => {
-
-  // }
-    
-  // }
+ 
   useEffect(() => {
     if (userId) {
       getTeacherData(userId);
     }
-  }, [userId]);
+  }, [userId, keyFresh]);
 
 
 
@@ -64,51 +69,59 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
     let value = e.target.value;
     let name = e.target.name;
     
-    setObj((prevalue) => {
-      return {
-        ...prevalue,
-        [name]: value
-      }
-    });
-    
+    // setObj((prevalue) => {
+    //   return {
+    //     ...prevalue,
+    //     [name]: value
+    //   }
+    // });
 
+
+    
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+   
     try{
       let res = await fetch("http://18.140.66.234/api/v1/teachers",{
+        headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
         method:"PUT",
         body:JSON.stringify({
-          // name:obj.name,
-          // email:obj.email,
-          // phone:obj.phone,
-          // address:obj.address
           address: obj.address,
           dob: obj.dob,
           email: obj.email,
           facultyCode: obj.facultyCode,
           gender: obj.gender,
-          id: teacher.id,
+          id: obj.id,
           manager: obj.manager,
           name: obj.name,
           password: obj.password,
           phone: obj.phone,
           remark: obj.remark,
-          roleCodes: obj.roleCodes
-          ,
+          roleCodes: obj.roleCodes,
+          userId:obj,userId,
         }),
       });
       let resJson = await res.json();
       if( res.status === 200 ){
         setObj("");
         setMessenger("User created successfully");
+        toast.success("Success!")
+        setKeyFresh(old => old + 1)
       } else {
         setMessenger("Some error occured ");
+        toast.error("Error!")
       }
     } catch(err){
       console.log(err);
     }
+
+
+    handleClose();
 
     // console.log(obj);
 
@@ -147,12 +160,17 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Họ Tên</h3>
                 <input
-                name="name"
+                  name="name"
                   onFocus={(e) => {
                     setActiveInput(e.target.id);
                   }}
-                  placeholder = {teacher.name}
-                  onChange = {handleChange}
+                  value = {obj.name}
+                  onChange={(e) => {
+                    setObj((old) => {
+                      const newObject = {...old, name: e.target.value}
+                      return newObject
+                    })
+                  }}
                   onBlur={e => { setActiveInput(null);  }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
@@ -162,6 +180,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
                   Nguyen Van A
                 </label>
               </div>
+              
               <div
                 className={`${
                   activeInput == "first_2" && "active-input"
@@ -175,8 +194,14 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
                   onFocus={(e) => {
                     setActiveInput(e.target.id);
                   }}
-                  placeholder={teacher.phone}
-                  onChange = {handleChange}
+                  value={obj.phone}
+                  onChange={(e) => {
+                    setObj((old) => {
+                      const newObject = {...old, phone: e.target.value}
+                      return newObject
+                    })
+                  }}
+
                   onBlur={e => { setActiveInput(null);  }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
@@ -199,8 +224,13 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
                   onFocus={(e) => {
                     setActiveInput(e.target.id);
                   }}
-                  placeholder={teacher.email}
-                  onChange = {handleChange}
+                  value={obj.email}
+                  onChange={(e) => {
+                    setObj((old) => {
+                      const newObject = {...old, email: e.target.value}
+                      return newObject
+                    })
+                  }}
                   onBlur={e => { setActiveInput(null);  }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
@@ -210,6 +240,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
                   example@example.com
                 </label>
               </div>
+
               <div
                 className={`${
                   activeInput == "first_4" && "active-input"
@@ -219,11 +250,14 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
                   Chức vụ
                 </h3>
                 <input
+                // readonly
+                  disabled
                   onFocus={(e) => {
                     setActiveInput(e.target.id);
                   }}
+                  value=""
                   onBlur={e => { setActiveInput(null);  }}
-
+                  onChange = {e =>{ setObj(...obj, {role: e.target.value})}}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
                   id="first_4"
@@ -245,8 +279,13 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId }) => {
                   onFocus={(e) => {
                     setActiveInput(e.target.id);
                   }}
-                  placeholder={teacher.address}
-                  onChange = {handleChange}
+                  value={obj.address}
+                  onChange={(e) => {
+                    setObj((old) => {
+                      const newObject = {...old, address: e.target.value}
+                      return newObject
+                    })
+                  }}
                   onBlur={e => { setActiveInput(null);  }}
                   className="mb-[12px] px-[12px] w-[716px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"

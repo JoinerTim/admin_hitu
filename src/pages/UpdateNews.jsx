@@ -5,6 +5,7 @@ import updateFormImg from "../assests/updateForm.png";
 
 const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
     const confirmRef = useRef();
+    const [message,setMessenger] = useState('');
 
     const [news, setNews] = useState({});
     const [activeInput, setActiveInput] = useState(null);
@@ -23,9 +24,10 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
     });
   
     const getNewsData = async (newsId) => {
-      const { data } = await NewsAPI.getPageNewsAPI(newsId);
-      console.log(data);
-      setNews(data);
+      const { data: { id, content, createdBy, createdDate, modifiedBy, modifiedDate, shortDescription, slug, status, thumbnail, title} } = await NewsAPI.getPageNewsAPI(newsId);
+      // console.log(data); 
+      setObj({...obj,id,content,createdBy,createdDate,modifiedBy,modifiedDate,shortDescription,slug,status, thumbnail,title});
+      // console.log(obj);
     };
     useEffect(() => {
       if (newsId) {
@@ -51,21 +53,42 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
       setUpdateShow(!updateShow);
     };
     const handleChange = (e) => { 
-          setObj({
+          setObj({...obj,
           type: e.target.name,
           value: e.target.value,
-          
         });
    }
   
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault()
-
+      console.log(obj);
+      try{
+        let res = await fetch("http://18.140.66.234/api/v1/news",{
+          headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+          method:"PUT",
+          body:JSON.stringify({
+            files: obj.thumbnail,
+            content: obj.content,
+            facultyCode: obj.facultyCode,
+            id: obj.id,
+            shortDescription: obj.shortDescription,
+            title: obj.title,
+          }),
+        });
+        let resJson = await res.json();
+        if( res.status === 200 ){
+          setObj("");
+          setMessenger("User created successfully");
+        } else {
+          setMessenger("Some error occured ");
+        }
+      } catch(err){
+        console.log(err);
+      }
     }
-
-
-
-
 
     return (
       <div className="update-customer">
@@ -97,6 +120,14 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
                 >
                   <h3 className="mb-[12px] font-[500] text-[16px]">Title</h3>
                   <input
+                  name="title"
+                  value = {obj.title}
+                  onChange={(e)=>{
+                    setObj((old)=>{
+                      const newobj = {...obj,title:e.target.value};
+                      return newobj
+                    }) 
+                  }}
                     onFocus={(e) => {
                       setActiveInput(e.target.id);
                     }}
@@ -118,8 +149,16 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
                     Short Descriptions
                   </h3>
                   <input
+                    name = "ShortDescription"
                     onFocus={(e) => {
                       setActiveInput(e.target.id);
+                    }}
+                    value = {obj.shortDescription}
+                    onChange={(e)=>{
+                      setObj((old)=>{
+                        const newobj = {...obj,shortDescription:e.target.value};
+                        return newobj
+                      }) 
                     }}
                     onBlur={e => { setActiveInput(null);  }}
                     className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
@@ -138,12 +177,20 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
                   } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
                 >
                   <h3 className="mb-[12px] font-[500] text-[16px]">Content</h3>
-                  <input
+                  <textarea
+                  name= "content"
                     onFocus={(e) => {
                       setActiveInput(e.target.id);
                     }}
+                    value = {obj.content}
+                    onChange={(e)=>{
+                      setObj((old)=>{
+                        const newobj = {...obj,content:e.target.value};
+                        return newobj
+                      }) 
+                    }}
                     onBlur={e => { setActiveInput(null);  }}
-                    className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
+                    className="mb-[12px] px-[12px] w-[348px] h-full input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                     type="text"
                     id="first_3"
                   />
@@ -155,12 +202,20 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
                     activeInput == "first_4" && "active-input"
                   } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
                 >
-                  <h3 className="mb-[12px] font-[500] text-[16px]">
+                  {/* <h3 className="mb-[12px] font-[500] text-[16px]">
                     Thumbnail
                   </h3>
                   <input
+                  name = "thumbnail"
                     onFocus={(e) => {
                       setActiveInput(e.target.id);
+                    }}
+                    value = {obj.thumbnail}
+                    onChange={(e)=>{
+                      setObj((old)=>{
+                        const newobj = {...obj,thumbnail:e.target.value};
+                        return newobj
+                      }) 
                     }}
                     onBlur={e => { setActiveInput(null);  }}
   
@@ -169,14 +224,33 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
                     id="first_4"
                   />
                   <label className="font-[400] text-[11px]" htmlFor="first_4">
-                  </label>
+                  </label> */}
+                  
+                  <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload file</label>
+                  <input 
+                    name = "thumbnail"
+                    accept = "png,jpeg,jpg"
+                    onFocus={(e) => {
+                      setActiveInput(e.target.id);
+                    }}
+                    onChange={(e)=>{
+                      setObj((old)=>{
+                        const newobj = {...obj,thumbnail:e.target.files};
+                        return newobj
+                      }) 
+                    }}
+                    onBlur={e => { setActiveInput(null);  }}
+                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
+                    id="file_input" 
+                    type="file"
+                  />
+
                 </div>
               </div>  
             </div>
             <div className="border-b-[1px] border-black"></div>
             <div className="flex justify-center items-center text-center">
               <button onClick={handleSubmit} className="btn-set-css min-w-[180px] my-[20px] rounded-[3px]  h-[50px] p-[10px] font-[900] text-[15px] border-[1px] border-[rgb(216, 65, 48)]">Submit</button>
-              <button onClick={handleClose} className="btn-set-css min-w-[180px] my-[20px] rounded-[3px]  h-[50px] p-[10px] font-[900] text-[15px] border-[1px] border-[rgb(216, 65, 48)]">Cancel</button>
             </div>
           </div>
         </form>

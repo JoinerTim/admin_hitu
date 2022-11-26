@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
 
 import { getListNews } from '../redux/toolskit/newsSlice'
 import UpdateNews from './UpdateNews';
 
-
-// import { ScheduleComponent, ViewsDirective, ViewDirective, Day, Week, WorkWeek, Month, Agenda, Inject, Resize, DragAndDrop } from '@syncfusion/ej2-react-schedule';
-// import { DatePickerComponent } from '@syncfusion/ej2-react-calendars';
-
 const News = () =>{
   const [news, setNews] = useState([]);
   
   const dispatch = useDispatch();
-  const history = useNavigate();
 
   const [keyFresh, setKeyFresh] = useState(0);
   const [countSelected, setCountSelected] = useState(0);
@@ -42,11 +36,6 @@ const handleDeleteNews = async (row) => {
 };
 
 const columns = [
-  // {
-  //   name: "Id",
-  //   selector: (row) => row.id,
-  //   width:"50px"
-  // },
   {
     name: "Ngày Tạo",
     selector: (row) => row.createdDate.slice(0,10),
@@ -65,32 +54,12 @@ const columns = [
     sortable: true,
     width:"200px"
   },
-  // {
-  //   name: "Content",
-  //   selector: (row) => row.content,
-  //   sortable: true,
-  //   width:"500px"
-  // },
   {
     name: "ShortDescription",
     selector: (row) => row.shortDescription,
     sortable: true,
     width:"500px"
   },
-  
-  // {
-  //   name: "Status",
-  //   selector: (row) => row.status,
-  //   sortable: true,
-  //   width:"100px"
-  // },
-  // {
-  //   name: "Thumbnail",
-  //   selector: (row) => row.thumbnail,
-  //   sortable: true,
-  //   width:"500px"
-  // },
-  
   {
     name: "Actions",
     selector: (row) => (
@@ -98,7 +67,6 @@ const columns = [
         <button
           className="btn-action update-handle"
           onClick={() => {
-            // history(`/dashboard/update/user/${row.id}`);
             setUpdateShow(true)
             setNewsId(row.id)
           }}
@@ -120,12 +88,11 @@ const columns = [
   useEffect(
     ()=>{
       getData()
-    },[]
+    },[keyFresh]
   )
   return (
     <div className="col l-10 m-[30px_50px]">
       {
-        // <DataTableExtensions {...tableData} >
         <DataTable
           title="Danh sách tin tức"
           columns={columns}
@@ -147,10 +114,8 @@ const columns = [
           }
           dense
         />
-        // </DataTableExtensions>
       }
-      {/* {loading && <Loader />} */}
-      <UpdateNews updateShow={updateShow} setUpdateShow={setUpdateShow} newsId={newsId} setNewsId={setNewsId}/>
+      <UpdateNews updateShow={updateShow} setUpdateShow={setUpdateShow} newsId={newsId} setNewsId={setNewsId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
     </div>
   );
 }
