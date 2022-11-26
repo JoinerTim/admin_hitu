@@ -22,26 +22,8 @@ export const getListNews = createAsyncThunk(
 export const getPageNews = createAsyncThunk(
 "users_admin/page_news",
 async (payload, thunkApi) => {
-    const {data} = await API.getPageNewsAPI(payload.page, payload.size);
+    const {data} = await API.getPageNewsAPI(payload.page);
     return data.data;
-}
-);
-
-//---------------------------------NOTIFICATION---------------------------------------//
-
-export const getListNotification = createAsyncThunk(
-  "users_admin/list_notification",
-  async (payload, thunkApi) => {
-    const {data} = await API_NOTI.getListNotification(payload.page, payload.size);
-    return data.data;
-  }
-);
-
-export const getPageNotification = createAsyncThunk(
-"users_admin/page_notification",
-async (payload, thunkApi) => {
-  const {data} = await API_NOTI.getPageNotification(payload.page, payload.size);
-  return data.data;
 }
 );
 

@@ -102,12 +102,10 @@ const columns = [
           fixedHeaderScrollHeight="400px"
           selectableRows
           selectableRowsHighlight={false}
-          // onSelectedRowsChange={handleSelectedChange}
           actions={
             <div>
               <button className="btn" onClick="">
                 Xóa (
-                  {/* {countSelected} */}
                   ){" "}
               </button>
             </div>

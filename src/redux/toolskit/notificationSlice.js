@@ -13,7 +13,7 @@ const initialState = {
 export const getListNotification = createAsyncThunk(
   "users_admin/list_notification",
   async (payload, thunkApi) => {
-    const {data} = await API.getListNotification(payload.page, payload.size);
+    const {data} = await API.getListNotificationAPI(payload.page, payload.size);
     return data.data;
   }
 );

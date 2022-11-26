@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
+
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { FiSettings } from 'react-icons/fi';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 
 import { Navbar, Footer, Sidebar, ThemeSettings } from './components';
-import { Ecommerce, News, Employees, Stacked, Pyramid, Customers, Notification, Line, Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor } from './pages';
+import { Login, Ecommerce, News, Employees, Stacked, Pyramid, Customers, Notification, Line, Area, Bar, Pie, Financial, ColorPicker, ColorMapping, Editor } from './pages';
 import './App.css';
 
 import { useStateContext } from './contexts/ContextProvider';
@@ -41,6 +43,8 @@ const App = () => {
 
             </TooltipComponent>
           </div>
+          <Route path="/Login" element={(<Login />)} />
+
           {activeMenu ? (
             <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
               <Sidebar />

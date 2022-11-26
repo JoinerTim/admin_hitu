@@ -2,6 +2,7 @@ export { default as Ecommerce } from './Ecommerce';
 export { default as Notification } from './Notification';
 // export { default as Orders } from './Orders';
 export { default as Employees } from './Employees';
+export { default as Login } from './Login';
 export { default as Editor } from './Editor';
 export { default as Customers } from './Customers';
 export { default as ColorPicker } from './ColorPicker';

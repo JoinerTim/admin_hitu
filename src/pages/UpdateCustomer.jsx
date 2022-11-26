@@ -33,12 +33,12 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
 
   const getTeacherData = async (userId) => {
     const {data: {address, dob, email, facultyCode, gender, id, manager, name, password, phone, remark, roleCodes}} = await TeacherAPI.getSingleTeacher(userId);
-    setObj({...obj, address, dob, email, facultyCode, gender, id, manager, name, password, phone, remark, roleCodes, userId})
+    setObj({...obj, address, dob, email, facultyCode, gender, id, manager, name, phone, remark, roleCodes, userId})
     // setObj((old) => {
     //   const constpass = {...old, password:"111111"}
     //   return constpass
     // })
-    console.log(obj);
+    // console.log(obj);
   };
  
   useEffect(() => {
@@ -72,6 +72,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(obj);
    
     try{
       let res = await fetch("http://18.140.66.234/api/v1/teachers",{
@@ -89,7 +90,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
           id: obj.id,
           manager: obj.manager,
           name: obj.name,
-          password: obj.password,
+          // password: obj.password,
           phone: obj.phone,
           remark: obj.remark,
           roleCodes: obj.roleCodes,
@@ -99,11 +100,11 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
       let resJson = await res.json();
       if( res.status === 200 ){
         setObj("");
-        setMessenger("User created successfully");
+        // setMessenger("User created successfully");
         toast.success("Success!")
         setKeyFresh(old => old + 1)
       } else {
-        setMessenger("Some error occured ");
+        // setMessenger("Some error occured ");
         toast.error("Error!")
       }
     } catch(err){

@@ -1,40 +1,39 @@
 import React, { useRef, useEffect, useState } from "react";
-import NewsAPI from "../API/NewsAPI";
+import NotificationAPI from "../API/NotificationAPI";
 import "./UpdateNotification.scss";
 import updateFormImg from "../assests/updateForm.png";
 import { toast } from "react-toastify";
 
-const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
+const UpdateNotification = ({ updateShow, setUpdateShow, notificationId, setNotificationId ,keyFresh ,setKeyFresh }) => {
     const confirmRef = useRef();
     const [message,setMessenger] = useState('');
 
-    const [news, setNews] = useState({});
+    const [notification, setNotification] = useState({});
     const [activeInput, setActiveInput] = useState(null);
     const [obj,setObj] = useState({
       id:"",
-      content:"",
-      createdBy:"",
       createdDate:"",
-      modifiedBy:"",
+      createdBy:"",
       modifiedDate:"",
-      shortDescription:"",
-      slug:"",
+      modifiedBy:"",
       status:"",
+      title:"",
+      shortDescription:"",
+      content:"",
       thumbnail:"",
-      title:""
+      slug:"",
+      type:"",
     });
   
-    const getNewsData = async (newsId) => {
-      const { data: { id, content, createdBy, createdDate, modifiedBy, modifiedDate, shortDescription, slug, status, thumbnail, title} } = await NewsAPI.getPageNewsAPI(newsId);
-      // console.log(data); 
-      setObj({...obj,id,content,createdBy,createdDate,modifiedBy,modifiedDate,shortDescription,slug,status, thumbnail,title});
-      // console.log(obj);
+    const getNotificationData = async (notificationId) => {
+      const { data: { id, content, createdBy, createdDate, modifiedBy, modifiedDate, shortDescription, slug, status, thumbnail, title,type} } = await NotificationAPI.getNotificationIdAPI(notificationId);
+      setObj({...obj,id,content,createdBy,createdDate,modifiedBy,modifiedDate,shortDescription,slug,status, thumbnail,title,type});
     };
     useEffect(() => {
-      if (newsId) {
-        getNewsData(newsId);
+      if (notificationId) {
+        getNotificationData(notificationId);
       }
-    }, [newsId]);
+    }, [notificationId]);
   
 
 
@@ -49,7 +48,7 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
   
     const handleClose = () => {
       setActiveInput(null);
-      setNewsId(null);
+      setNotificationId(null);
       confirmRef.current.classList.remove("show");
       setUpdateShow(!updateShow);
     };
@@ -64,7 +63,7 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
       e.preventDefault()
       console.log(obj);
       try{
-        let res = await fetch("http://18.140.66.234/api/v1/news",{
+        let res = await fetch("http://18.140.66.234/api/v1/notification",{
           headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -140,7 +139,7 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
                     id="first_1"
                   />
                   <label className="font-[400] text-[11px]" htmlFor="first_1">
-                    {news.title}
+                    {notification.title}
                   </label>
                 </div>
                 <div
@@ -169,7 +168,7 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
                     id="first_2"
                   />
                   <label className="font-[400] text-[11px]" htmlFor="first_2">
-                    {news.shortDescription}
+                    {notification.shortDescription}
                   </label>
                 </div>
               </div>
@@ -237,4 +236,4 @@ const UpdateNews = ({ updateShow, setUpdateShow, newsId, setNewsId }) => {
     );
   };
 
-export default UpdateNews
+export default UpdateNotification
