@@ -1,5 +1,6 @@
 import React from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
+import rmUserLocal from "../hook/removeUser";
 
 import { Button } from '.';
 import { userProfileData } from '../data/dummy';
@@ -8,6 +9,8 @@ import avatar from '../data/avatar.jpg';
 
 const UserProfile = () => {
   const { currentColor } = useStateContext();
+
+  // const rmUser = rmUserLocal("name")
 
   return (
     <div className="nav-item absolute right-1 top-16 bg-white dark:bg-[#42464D] p-8 rounded-lg w-96">
@@ -55,7 +58,8 @@ const UserProfile = () => {
         <Button
           color="white"
           bgColor={currentColor}
-          text="Logout"
+          text="Logout" 
+          // onclick={localStorage.clear()}
           borderRadius="10px"
           width="full"
         />

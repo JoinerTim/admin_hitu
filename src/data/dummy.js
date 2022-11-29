@@ -24,6 +24,8 @@ import product6 from './product6.jpg';
 import product7 from './product7.jpg';
 // import product8 from './product8.jpg';
 
+
+
 export const gridOrderImage = (props) => (
   <div>
     <img

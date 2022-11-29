@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import TeacherList from '../../API/TeacherAPI';
+import userApi from '../../API/UserAPI';
 
 
 const initialState = {
@@ -7,6 +8,15 @@ const initialState = {
   loading: false,
   error: undefined,
 };
+
+export const login = createAsyncThunk(
+  "users/login",
+  async (payload, thunkApi) => {
+    const data = await userApi.postLoginUser(payload);
+    console.log(data);
+    return data;
+  }
+);
 
 export const getListTeacherPerPage = createAsyncThunk(
     "users/list_teacher_users",

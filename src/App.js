@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-
+import useUserLocal from "./hook/useUserLocal";
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { FiSettings } from 'react-icons/fi';
@@ -21,13 +21,16 @@ const App = () => {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-  }, []);
+  }, [])
+  const userID = localStorage.getItem("accessToken") ? localStorage.getItem("accessToken") :null;
+
+  
 
   return (
     <div className={currentMode === 'Dark' ? 'dark' : ''}>
       <BrowserRouter>
         <div className="flex relative dark:bg-main-dark-bg">
-          <div className="fixed right-4 bottom-4" style={{ zIndex: '1000' }}>
+          {/* <div className="fixed right-4 bottom-4" style={{ zIndex: '1000' }}>
             <TooltipComponent
               content="Settings"
               position="Top"
@@ -43,7 +46,6 @@ const App = () => {
 
             </TooltipComponent>
           </div>
-          <Route path="/Login" element={(<Login />)} />
 
           {activeMenu ? (
             <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
@@ -60,43 +62,47 @@ const App = () => {
                 ? 'dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full  '
                 : 'bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 '
             }
-          >
+          > */}
             <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
-              <Navbar />
+              {/* <Navbar /> */}
             </div>
             <div>
               {themeSettings && (<ThemeSettings />)}
+              { userID === null ? (
+                <Login></Login>
+                 ) : (
+                  <Routes>
+                    {/* dashboard  */}
+                    <Route path="/" element={(<Ecommerce />)} />
+                    <Route path="/Home" element={(<Ecommerce />)} />
 
-              <Routes>
-                {/* dashboard  */}
-                <Route path="/" element={(<Ecommerce />)} />
-                <Route path="/Home" element={(<Ecommerce />)} />
+                    {/* pages  */}
+                    {/* <Route path="/orders" element={<Orders />} /> */}
+                    <Route path="/Students" element={<Employees />} />
+                    <Route path="/Teachers" element={<Customers />} />
 
-                {/* pages  */}
-                {/* <Route path="/orders" element={<Orders />} /> */}
-                <Route path="/Students" element={<Employees />} />
-                <Route path="/Teachers" element={<Customers />} />
+                    {/* apps  */}
+                    <Route path="/News" element={<News />} />
+                    <Route path="/Notification" element={<Notification />} />
+                    <Route path="/editor" element={<Editor />} />
+                    <Route path="/color-picker" element={<ColorPicker />} />
 
-                {/* apps  */}
-                <Route path="/News" element={<News />} />
-                <Route path="/Notification" element={<Notification />} />
-                <Route path="/editor" element={<Editor />} />
-                <Route path="/color-picker" element={<ColorPicker />} />
+                    {/* charts  */}
+                    <Route path="/line" element={<Line />} />
+                    <Route path="/area" element={<Area />} />
+                    <Route path="/bar" element={<Bar />} />
+                    <Route path="/pie" element={<Pie />} />
+                    <Route path="/financial" element={<Financial />} />
+                    <Route path="/color-mapping" element={<ColorMapping />} />
+                    <Route path="/pyramid" element={<Pyramid />} />
+                    <Route path="/stacked" element={<Stacked />} />
 
-                {/* charts  */}
-                <Route path="/line" element={<Line />} />
-                <Route path="/area" element={<Area />} />
-                <Route path="/bar" element={<Bar />} />
-                <Route path="/pie" element={<Pie />} />
-                <Route path="/financial" element={<Financial />} />
-                <Route path="/color-mapping" element={<ColorMapping />} />
-                <Route path="/pyramid" element={<Pyramid />} />
-                <Route path="/stacked" element={<Stacked />} />
-
-              </Routes>
+                  </Routes>
+                )
+              }
             </div>
             <Footer />
-          </div>
+          {/* </div> */}
         </div>
       </BrowserRouter>
     </div>
