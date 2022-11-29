@@ -21,8 +21,8 @@ const Login = () => {
     const dispatch = useDispatch();
     localStorage.removeItem("isAuthenticated");
   
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [username, setUsername] = useState("admin");
+    const [password, setPassword] = useState("admin@2022");
   
     const history = useNavigate();
   
