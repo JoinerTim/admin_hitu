@@ -68,7 +68,7 @@ const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }
       e.preventDefault()
       console.log(obj);
       try{
-        let res = await fetch("http://18.140.66.234/api/v1/notification",{
+        let res = await fetch("http://18.140.66.234/api/v1/notifications",{
           headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
