@@ -5,6 +5,7 @@ import DataTable from "react-data-table-component";
 
 import { getListNotification } from '../redux/toolskit/notificationSlice.js'
 import UpdateNotification from './UpdateNotification';
+import CreateNotification from './CreateNoti';
 
 const Notification = () =>{
   const [notification, setNotification] = useState([]);
@@ -16,6 +17,7 @@ const Notification = () =>{
   const [arrayId, setArrayId] = useState([]);
 
   const [updateShow, setUpdateShow] = useState(false)
+  const [createShow, setCreateShow] = useState(false)
   const [notificationId, setNotificationId] = useState(null)
 
   const getData = async () => {
@@ -104,8 +106,8 @@ const columns = [
           selectableRowsHighlight={false}
           actions={
             <div>
-              <button className="btn" onClick="">
-                Xóa (
+              <button className="btn" onClick={()=>{setCreateShow(true)}}>
+                Tạo (
                   ){" "}
               </button>
             </div>
@@ -114,6 +116,7 @@ const columns = [
         />
       }
       <UpdateNotification updateShow={updateShow} setUpdateShow={setUpdateShow} notificationId={notificationId} setNotificationId={setNotificationId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <CreateNotification createShow={createShow} setCreateShow={setCreateShow}  keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import DataTable from "react-data-table-component";
 
 import { getListNews } from '../redux/toolskit/newsSlice'
 import UpdateNews from './UpdateNews';
+import CreateNews from './CreateNews';
 
 const News = () =>{
   const [news, setNews] = useState([]);
@@ -16,6 +17,7 @@ const News = () =>{
   const [arrayId, setArrayId] = useState([]);
 
   const [updateShow, setUpdateShow] = useState(false)
+  const [createShow, setCreateShow] = useState(false)
   const [newsId, setNewsId] = useState(null)
 
   const getData = async () => {
@@ -104,18 +106,19 @@ const columns = [
           selectableRowsHighlight={false}
           // onSelectedRowsChange={handleSelectedChange}
           actions={
+
             <div>
-              <button className="btn" onClick="">
-                Xóa (
-                  {/* {countSelected} */}
-                  ){" "}
+              <button className="btn" onClick={()=>{setCreateShow(true)}}>
+                Tạo {" "}
               </button>
             </div>
+            
           }
           dense
         />
       }
       <UpdateNews updateShow={updateShow} setUpdateShow={setUpdateShow} newsId={newsId} setNewsId={setNewsId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <CreateNews createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
     </div>
   );
 }
