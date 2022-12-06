@@ -3,6 +3,7 @@ import NotificationAPI from "../API/NotificationAPI";
 import "./UpdateNotification.scss";
 import updateFormImg from "../assests/updateForm.png";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }) => {
     const confirmRef = useRef();
@@ -13,35 +14,13 @@ const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }
     
     const [classCodes,setClassCodes] = useState();
     const [facultyCode,setFacultyCode] = useState();
-    const [notificationGroupCode,setNotificationGroupCode] = useState();
+    const [notificationGroupCode,setNotificationGroupCode] = useState([]);
     const [schoolYearCodes,setSchoolYearCodes] = useState();
     
-    const [obj,setObj] = useState({
-      createdDate:"",
-      createdBy:"",
-      modifiedDate:"",
-      modifiedBy:"",
-      status:"",
-      title:"",
-      shortDescription:"",
-      content:"",
-      thumbnail:"",
-      slug:"",
-      type:"",
-    });
-  
-    const getNotificationData = async (notificationId) => {
-      const { data: { id, content, createdBy, createdDate, modifiedBy, modifiedDate, shortDescription, slug, status, thumbnail, title,type} } = await NotificationAPI.getNotificationIdAPI(notificationId);
-      setObj({...obj,id,content,createdBy,createdDate,modifiedBy,modifiedDate,shortDescription,slug,status, thumbnail,title,type});
-    };
-    // useEffect(() => {
-    //   if (notificationId) {
-    //     getNotificationData(notificationId);
-    //   }
-    // }, [notificationId]);
-  
-
-
+    const [content, setContent] = useState("")
+    const [title, setTitle] = useState("")
+    const [shortDescription, setShortDescription] = useState("")
+    const [notifiGD, setNotifiGD] = useState("")
 
     const handleDisplay = () => {
       if (createShow) {
@@ -49,53 +28,49 @@ const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }
       }
     };
     handleDisplay();
-    useEffect(() => {}, [createShow]);
-  
+
+    const getNotificationGroupCode = async() => {
+      const {data} = await axios.get("http://18.140.66.234/api/v1/notification-groups/all?status=true")
+      setNotificationGroupCode(data)
+    }
+
+    useEffect(() => {
+      getNotificationGroupCode()
+    }, [keyFresh])
+
     const handleClose = () => {
+      setContent("")
+      setTitle("")
+      setNotifiGD("")
+      setShortDescription("")
       setActiveInput(null);
-    //   setNotificationId(null);
-      confirmRef.current.classList.remove("show");
       setCreateShow(!createShow);
+      confirmRef.current.classList.remove("show");
     };
-    const handleChange = (e) => { 
-          setObj({...obj,
-          type: e.target.name,
-          value: e.target.value,
-        });
-   }
-  
+
     const handleSubmit = async (e) => {
       e.preventDefault()
-      console.log(obj);
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`
+        },
+      };
       try{
-        let res = await fetch("http://18.140.66.234/api/v1/notifications",{
-          headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-          method:"POST",
-          body:JSON.stringify({
-            files: obj.thumbnail,
-            classCodes: classCodes,
-            content: obj.content,
-            facultyCode: facultyCode,
-            notificationGroupCode: notificationGroupCode,
-            schoolYearCodes: schoolYearCodes,
-            shortDescription: obj.shortDescription,
-            title: obj.title,
-          }),
-        });
-        let resJson = await res.json();
-        if( res.status === 200 ){
-          setObj("");
-          setMessenger("User created successfully");
-          toast.successfully("successfully!")
-        } else {
-          setMessenger("Some error occured ");
-          toast.error("error!")
-        }
+        
+        await axios.post("http://18.140.66.234/api/v1/notifications?" + new URLSearchParams({
+          content,
+          notificationGroupCode: notifiGD,
+          shortDescription,
+          title,
+      }), undefined, config)
+         
+          handleClose()
+          setKeyFresh(old => old + 1)
+          toast.success("successfully!")
+
       } catch(err){
-        console.log(err);
+        toast.error("Error!")
       }
     }
 
@@ -130,12 +105,9 @@ const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }
                   <h3 className="mb-[12px] font-[500] text-[16px]">Title</h3>
                   <input
                   name="title"
-                  value = {obj.title}
+                  value = {title}
                   onChange={(e)=>{
-                    setObj((old)=>{
-                      const newobj = {...obj,title:e.target.value};
-                      return newobj
-                    }) 
+                   setTitle(e.target.value)
                   }}
                     onFocus={(e) => {
                       setActiveInput(e.target.id);
@@ -162,12 +134,9 @@ const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }
                     onFocus={(e) => {
                       setActiveInput(e.target.id);
                     }}
-                    value = {obj.shortDescription}
+                    value = {shortDescription}
                     onChange={(e)=>{
-                      setObj((old)=>{
-                        const newobj = {...obj,shortDescription:e.target.value};
-                        return newobj
-                      }) 
+                      setShortDescription(e.target.value)
                     }}
                     onBlur={e => { setActiveInput(null);  }}
                     className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
@@ -191,12 +160,9 @@ const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }
                     onFocus={(e) => {
                       setActiveInput(e.target.id);
                     }}
-                    value = {obj.content}
+                    value = {content}
                     onChange={(e)=>{
-                      setObj((old)=>{
-                        const newobj = {...obj,content:e.target.value};
-                        return newobj
-                      }) 
+                      setContent(e.target.value)
                     }}
                     onBlur={e => { setActiveInput(null);  }}
                     className="mb-[12px] px-[12px] w-[348px] h-full input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
@@ -206,7 +172,7 @@ const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }
                   <label className="font-[400] text-[11px]" htmlFor="first_3">
                   </label>
                 </div>
-                <div
+                {/* <div
                   className={`${
                     activeInput == "first_4" && "active-input"
                   } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
@@ -230,7 +196,37 @@ const CreateNotification = ({ createShow, setCreateShow, keyFresh ,setKeyFresh }
                     type="file"
                   />
 
-                </div>
+                </div> */}
+                <div
+              className={`${
+                activeInput == "create_4" && "active-input"
+              } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+            >
+              <h3 className="mb-[12px] font-[600] text-[16px]">
+                Đối tượng thông báo
+              </h3>
+              <select 
+              value={notifiGD }
+              onFocus={(e) => {
+                setActiveInput(e.target.id)
+              }}
+              onChange={(e) => {
+                setNotifiGD(e.target.value)
+              }}
+              className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]" name="" >
+                <option value="" selected>Chọn Đối Tượng</option>
+                {
+                  notificationGroupCode.map((item, i) => (
+                    <option
+                    key={i}
+                    id="create_4"
+                    value={item.code}>
+                    {item.name}
+                  </option>
+                  ))
+                }
+              </select>
+            </div>
               </div>  
             </div>
             <div className="border-b-[1px] border-black"></div>

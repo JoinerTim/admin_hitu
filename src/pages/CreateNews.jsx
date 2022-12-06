@@ -1,238 +1,273 @@
 import React, { useRef, useEffect, useState } from "react";
-import NewsAPI from "../API/NewsAPI";
 import "./CreateNews.scss";
 import updateFormImg from "../assests/updateForm.png";
 import { toast } from "react-toastify";
-
-const CreateNews = ({ createShow, setCreateShow}) => {
-    const confirmRef = useRef();
-    const [message,setMessenger] = useState('');
-
-    const [news, setNews] = useState({});
-    const [activeInput, setActiveInput] = useState(null);
-    const [obj,setObj] = useState({
-      id:"",
-      content:"",
-      createdBy:"",
-      createdDate:"",
-      modifiedBy:"",
-      modifiedDate:"",
-      shortDescription:"",
-      slug:"",
-      status:"",
-      thumbnail:"",
-      title:""
-    });
-  
-    const getNewsData = async (newsId) => {
-      const { data: { id, content, createdBy, createdDate, modifiedBy, modifiedDate, shortDescription, slug, status, thumbnail, title} } = await NewsAPI.getPageNewsAPI(newsId);
-      // console.log(data); 
-      setObj({...obj,id,content,createdBy,createdDate,modifiedBy,modifiedDate,shortDescription,slug,status, thumbnail,title});
-      // console.log(obj);
-    };
-    // useEffect(() => {
-    //   if (newsId) {
-    //     getNewsData(newsId);
-    //   }
-    // }, [newsId]);
-  
+import axios from "axios";
+import {
+  EditorState,
+  convertToRaw,
+} from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import draftToHtml from "draftjs-to-html";
+import Select from 'react-select';
+import Test from "./Test";
 
 
 
-    const handleDisplay = () => {
-      if (createShow) {
-        confirmRef.current.classList.add("show");
-      }
-    };
-    handleDisplay();
-    useEffect(() => {}, [createShow]);
-  
-    const handleClose = () => {
-      setActiveInput(null);
-    //   setNewsId(null);
-      confirmRef.current.classList.remove("show");
-      setCreateShow(!createShow);
-    };
-    const handleChange = (e) => { 
-          setObj({...obj,
-          type: e.target.name,
-          value: e.target.value,
-        });
-   }
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault()
-    //   console.log(obj);
-      try{
-        let res = await fetch("http://18.140.66.234/api/v1/news",{
-          headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
+  const confirmRef = useRef();
+  const [file, setFile] = useState({ name: "Chọn ảnh" });
+  const [options, setOptions] = useState([])
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
+
+  const [activeInput, setActiveInput] = useState(null);
+  const [obj, setObj] = useState({});
+  const [faculty,setFaculty] = useState([]);
+  const [optionSelected, setOptionSelected] = useState(null)
+
+
+  const handleDisplay = () => {
+    if (createShow) {
+      confirmRef.current.classList.add("show");
+    }
+  };
+  handleDisplay();
+  useEffect(() => {
+    getFaculty()
+  }, [createShow]);
+
+  const getFaculty = async() => {
+    const {data} = await axios.get("http://18.140.66.234/api/v1/faculties/all?status=true")
+    let optionForFaculty = []
+    data.forEach((item) => {
+      optionForFaculty.push({value: item.code, label: item.name})
+    })
+    setOptions(optionForFaculty)
+    setFaculty(data)
+  }
+
+  const handleClose = () => {
+    setActiveInput(null);
+    confirmRef.current.classList.remove("show");
+    setCreateShow(!createShow);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${JSON.parse(
+          localStorage.getItem("accessToken")
+        )}`,
       },
-          method:"POST",
-          body:JSON.stringify({
-            files: obj.thumbnail,
-            content: obj.content,
-            facultyCode: obj.facultyCode,
+    };
+
+    var bodyFormData = new FormData();
+    bodyFormData.append("file", file);
+
+    const facultyCodes = () => {
+      let stringFaculty = ""
+      optionSelected.map((item, i) => {
+        stringFaculty += "facultyCodes" + '=' + item.value + "&";
+      })
+      return stringFaculty
+    }
+    const facultyUrl = facultyCodes()
+
+
+    try {
+      await axios.post(
+        `http://18.140.66.234/api/v1/news?${facultyUrl}` +
+          new URLSearchParams({
+            content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
             shortDescription: obj.shortDescription,
             title: obj.title,
           }),
-        });
-        let resJson = await res.json();
-        if( res.status === 200 ){
-          setObj("");
-          setMessenger("User created successfully");
-          toast.successfully("successfully!")
-        } else {
-          setMessenger("Some error occured ");
-          toast.error("error!")
-        }
-      } catch(err){
-        console.log(err);
-      }
-    }
+        bodyFormData,
+        config
+      );
 
-    return (
-      <div className="update-customer">
-        <form ref={confirmRef} className="confirm">
-          <div className="p-[20px] h-[645px]">
-            <div className="closed" onClick={handleClose}>
-              <i className="fa-solid fa-square-xmark"></i>
-            </div>
-            <div className="heading-confirm">
-              <div className="flex justify-center items-center">
-                <img
-                  src={updateFormImg}
-                  width="170px"
-                  height="135px"
-                  alt="imgForm"
-                />
-                <h1 className="text-[20px] font-[600]">
-                  Tạo Tin tức
-                </h1>
-              </div>
-            </div>
-            <div className="border-b-[1px] border-black"></div>
-            <div className="mb-[20px] flex flex-col justify-center mx-[20px]">
-              <div className="flex justify-center items-center">
-                <div
-                  className={` ${
-                    activeInput == "first_1" && "active-input"
-                  } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
-                >
-                  <h3 className="mb-[12px] font-[500] text-[16px]">Title</h3>
-                  <input
-                  name="title"
-                  value = {obj.title}
-                  onChange={(e)=>{
-                    setObj((old)=>{
-                      const newobj = {...obj,title:e.target.value};
-                      return newobj
-                    }) 
-                  }}
-                    onFocus={(e) => {
-                      setActiveInput(e.target.id);
-                    }}
-                    onBlur={e => { setActiveInput(null);  }}
-                    className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
-                    type="text"
-                    id="first_1"
-                  />
-                  <label className="font-[400] text-[11px]" htmlFor="first_1">
-                    {news.title}
-                  </label>
-                </div>
-                <div
-                  className={`${
-                    activeInput == "first_2" && "active-input"
-                  } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
-                >
-                  <h3 className="mb-[12px] font-[500] text-[16px]">
-                    Short Descriptions
-                  </h3>
-                  <input
-                    name = "ShortDescription"
-                    onFocus={(e) => {
-                      setActiveInput(e.target.id);
-                    }}
-                    value = {obj.shortDescription}
-                    onChange={(e)=>{
-                      setObj((old)=>{
-                        const newobj = {...obj,shortDescription:e.target.value};
-                        return newobj
-                      }) 
-                    }}
-                    onBlur={e => { setActiveInput(null);  }}
-                    className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
-                    type="text"
-                    id="first_2"
-                  />
-                  <label className="font-[400] text-[11px]" htmlFor="first_2">
-                    {news.shortDescription}
-                  </label>
-                </div>
-              </div>
-              <div className="flex justify-center items-center">
-                <div
-                  className={` ${
-                    activeInput == "first_3" && "active-input"
-                  } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
-                >
-                  <h3 className="mb-[12px] font-[500] text-[16px]">Content</h3>
-                  <textarea
-                  name= "content"
-                    onFocus={(e) => {
-                      setActiveInput(e.target.id);
-                    }}
-                    value = {obj.content}
-                    onChange={(e)=>{
-                      setObj((old)=>{
-                        const newobj = {...obj,content:e.target.value};
-                        return newobj
-                      }) 
-                    }}
-                    onBlur={e => { setActiveInput(null);  }}
-                    className="mb-[12px] px-[12px] w-[348px] h-full input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
-                    type="text"
-                    id="first_3"
-                  />
-                  <label className="font-[400] text-[11px]" htmlFor="first_3">
-                  </label>
-                </div>
-                <div
-                  className={`${
-                    activeInput == "first_4" && "active-input"
-                  } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
-                >
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload file</label>
-                  <input 
-                    name = "thumbnail"
-                    accept = "png,jpeg,jpg"
-                    onFocus={(e) => {
-                      setActiveInput(e.target.id);
-                    }}
-                    onChange={(e)=>{
-                      setObj((old)=>{
-                        const newobj = {...obj,thumbnail:e.target.files};
-                        return newobj
-                      }) 
-                    }}
-                    onBlur={e => { setActiveInput(null);  }}
-                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
-                    id="file_input" 
-                    type="file"
-                  />
-                </div>
-              </div>  
-            </div>
-            <div className="border-b-[1px] border-black"></div>
-            <div className="flex justify-center items-center text-center">
-              <button onClick={handleSubmit} className="btn-set-css min-w-[180px] my-[20px] rounded-[3px]  h-[50px] p-[10px] font-[900] text-[15px] border-[1px] border-[rgb(216, 65, 48)]">Submit</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    );
+      setObj("");
+      setKeyFresh((old) => old + 1);
+      handleClose();
+      toast.success("successfully!");
+    } catch (err) {
+      toast.error("error!");
+    }
   };
 
-export default CreateNews
+  const handleFileChange = (e) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  return (
+    <div className="update-customer">
+      <form ref={confirmRef} className="confirm">
+        <div className="p-[20px] h-[645px]">
+          <div className="closed" onClick={handleClose}>
+            <i className="fa-solid fa-square-xmark"></i>
+          </div>
+          <div className="heading-confirm">
+            <div className="flex justify-center items-center">
+              <img
+                src={updateFormImg}
+                width="170px"
+                height="135px"
+                alt="imgForm"
+              />
+              <h1 className="text-[20px] font-[600]">Tạo Tin tức</h1>
+            </div>
+          </div>
+          <div className="border-b-[1px] border-black"></div>
+          <div className="mb-[20px] flex flex-col justify-center mx-[20px]">
+            <div className="flex justify-center items-center">
+              <div
+                className={` ${
+                  activeInput == "first_1" && "active-input"
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[12px] font-[500] text-[16px]">Tiêu Đề</h3>
+                <input
+                  name="title"
+                  value={obj.title}
+                  onChange={(e) => {
+                    setObj((old) => {
+                      const newobj = { ...obj, title: e.target.value };
+                      return newobj;
+                    });
+                  }}
+                  onFocus={(e) => {
+                    setActiveInput(e.target.id);
+                  }}
+                  onBlur={(e) => {
+                    setActiveInput(null);
+                  }}
+                  className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
+                  type="text"
+                  id="first_1"
+                />
+              </div>
+              <div
+                className={`${
+                  activeInput == "first_2" && "active-input"
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[12px] font-[500] text-[16px]">
+                  Mô Tả Ngắn
+                </h3>
+                <input
+                  name="ShortDescription"
+                  onFocus={(e) => {
+                    setActiveInput(e.target.id);
+                  }}
+                  value={obj.shortDescription}
+                  onChange={(e) => {
+                    setObj((old) => {
+                      const newobj = {
+                        ...obj,
+                        shortDescription: e.target.value,
+                      };
+                      return newobj;
+                    });
+                  }}
+                  onBlur={(e) => {
+                    setActiveInput(null);
+                  }}
+                  className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
+                  type="text"
+                  id="first_2"
+                />
+              </div>
+            </div>
+            <div className="flex justify-center items-center">
+              <div
+                className={`${
+                  activeInput == "first_4" && "active-input"
+                } rounded-[3px] w-[238px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <label
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mb-[12px] font-[500] text-[16px]" 
+                  htmlFor="file_inputCreate"
+                >
+                  Tải ảnh
+                </label>
+                <label htmlFor="file_inputCreate" className="flex items-center justify-center h-[40px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+                <input
+                  name="thumbnail"
+                  accept="png,jpeg,jpg"
+                  onFocus={(e) => {
+                    setActiveInput(e.target.id);
+                  }}
+                  onChange={handleFileChange}
+                  onBlur={(e) => {
+                    setActiveInput(null);
+                  }}
+                  className="hidden "
+                  id="file_inputCreate"
+                  type="file"
+                />
+                {file?.name !== "Chọn ảnh" ? "1 Đã Chọn" : file.name}
+                </label>
+              </div>
+              <div
+              className={`${
+                activeInput == "create_4" && "active-input"
+              } rounded-[3px] w-[500px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+            >
+              <h3 className="mb-[9px] font-[500] text-[16px]">
+                Khoa
+              </h3>
+
+              <Select
+                isMulti
+                defaultValue={optionSelected}
+                onChange={(option) => {setOptionSelected(option); console.log(option)}}
+                options={options}
+              />
+            </div>
+            </div>
+            {/*noi dung */}
+            <div className="flex justify-center items-center">
+              <div
+                className={` ${
+                  activeInput == "first_3" && "active-input"
+                } rounded-[3px] w-[730px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[12px] font-[500] text-[16px]">Nội Dung</h3>
+                <Editor
+                  editorState={editorState}
+                  wrapperClassName="demo-wrapper"
+                  editorClassName="demo-editor"
+                  onEditorStateChange={(state) => {
+                    setEditorState(state);
+                  }}
+                />
+                <label
+                  className="font-[400] text-[11px]"
+                  htmlFor="first_3"
+                ></label>
+              </div>
+            </div>
+          </div>
+          <div className="border-b-[1px] border-black"></div>
+          <div className="flex justify-center items-center text-center">
+            <button
+              onClick={handleSubmit}
+              className="btn-set-css min-w-[180px] my-[20px] rounded-[3px]  h-[50px] p-[10px] font-[900] text-[15px] border-[1px] border-[rgb(216, 65, 48)]"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default CreateNews;

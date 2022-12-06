@@ -3,6 +3,7 @@ import NotificationAPI from "../API/NotificationAPI";
 import "./UpdateNotification.scss";
 import updateFormImg from "../assests/updateForm.png";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const UpdateNotification = ({ updateShow, setUpdateShow, notificationId, setNotificationId ,keyFresh ,setKeyFresh }) => {
     const confirmRef = useRef();
@@ -61,34 +62,28 @@ const UpdateNotification = ({ updateShow, setUpdateShow, notificationId, setNoti
   
     const handleSubmit = async (e) => {
       e.preventDefault()
-      console.log(obj);
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`
+        },
+      };
       try{
-        let res = await fetch("http://18.140.66.234/api/v1/notification",{
-          headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-          method:"PUT",
-          body:JSON.stringify({
-            files: obj.thumbnail,
-            content: obj.content,
-            facultyCode: obj.facultyCode,
-            id: obj.id,
-            shortDescription: obj.shortDescription,
-            title: obj.title,
-          }),
-        });
-        let resJson = await res.json();
-        if( res.status === 200 ){
+        let res = await axios.put("http://18.140.66.234/api/v1/notifications?" + new URLSearchParams({
+          files: obj.thumbnail,
+          content: obj.content,
+          facultyCode: obj.facultyCode,
+          id: obj.id,
+          shortDescription: obj.shortDescription,
+          title: obj.title,
+      }),undefined, config )
+
           setObj("");
-          setMessenger("User created successfully");
-          toast.successfully("successfully!")
-        } else {
-          setMessenger("Some error occured ");
-          toast.error("error!")
-        }
+          setUpdateShow(false)
+          toast.success("success!")
+      
       } catch(err){
-        console.log(err);
+        toast.error("Error!")
       }
     }
 

@@ -3,11 +3,14 @@
     justify-content: center;
 }
 
-.confirm.show {
+.confirm.show, .delete_confirm.show {
     display: flex;
     flex-direction: column;
 }
 
+option{
+    height: 100px;
+}
 
 .confirm {
     display: none;
@@ -44,6 +47,22 @@
 
     }
 
+}
+.delete_confirm{
+    display: none;
+    background-color: #fff;
+    width: 525px;
+    height: 200px;
+    margin: 0 auto;
+    border-radius: 3px;
+    text-align: center;
+    position: fixed;
+    z-index: 1000;
+    opacity: 1;
+    animation: fadeChange 0.3s linear;
+    will-change: opacity, transform;
+    top: 27%;
+    right: 30%
 }
 
 .input-hover:hover, .input-hover:focus{

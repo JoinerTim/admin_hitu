@@ -10,6 +10,7 @@ const TeacherAPI = {
   },
 
 
+
   async getTeacherListAPI(page,size) {
     const url = `v1/teachers/page?page=${page}&size=${size}`;
     return await axiosClient.get(url);
@@ -18,6 +19,11 @@ const TeacherAPI = {
     const url = `/v1/teachers?userId=${userId}`;
     return await axiosClient.get(url);
   },
+
+  async deleteSingleUser(ids) {
+    const url = `v1/teachers/toggle-status?ids=${ids}`;
+    return await axiosClient.put(url);
+  }
 
 };
 

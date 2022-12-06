@@ -1,24 +1,15 @@
-import React, { Component, useState, useEffect } from 'react'
-import { toast } from "react-toastify";
-import UserAPI from '../API/UserAPI'
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from 'react'
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
 import { useDispatch, useSelector } from "react-redux";
-
-// import "./login.scss";
-import { login } from "../redux/toolskit/userSlice";
-// import { getMyCarts } from "../../../redux/toolkits/cartSlice";
+import {toast} from 'react-toastify'
 import "./Login.scss";
 
 
 
 const Login = () => {
-    const [hiddenPassword, setHiddenPassword] = useState(false);
-    const [submit, setSubmit] = useState({});
-    const [obj, setObj] = useState({});
     // const [loading, setLoading] = useState(false);
-    const dispatch = useDispatch();
     localStorage.removeItem("isAuthenticated");
   
     const [username, setUsername] = useState("admin");
@@ -47,23 +38,9 @@ const Login = () => {
             return res.json()
         }).then((data) => {
             localStorage.setItem("accessToken",JSON.stringify(data.accessToken) );
-            console.log(data)
+            history("/Teachers")
         })
         
-        // if (res.status === 200) {
-        //     console.log('123', res)
-        //     localStorage.setItem(
-        //       "accessToken",
-        //       JSON.stringify(res.accessToken)
-        //     );
-        //     // localStorage.setItem(
-        //     //   "refreshToken",
-        //     //   JSON.stringify(res.refreshToken)
-        //     // );
-        //     localStorage.setItem("name", JSON.stringify(res.name));
-        //     localStorage.setItem("roles", JSON.stringify(res.roles));
-
-        //   }
       };
       
     return (
@@ -75,12 +52,6 @@ const Login = () => {
                 type="text" 
                 name="username" 
                 value = {username}
-                // onChange={(e)=>{
-                //     setObj((old)=>{
-                //       const newobj = {...obj,username:e.target.value};
-                //       return newobj
-                //     }) 
-                //   }}
                 onChange={(e) => { setUsername(e.target.value) }}
                 required=""/>
                 <label>Username</label>

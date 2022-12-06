@@ -488,10 +488,12 @@ export const links = [
     links: [
       {
         name: 'Teachers',
+        title: 'Giáo Viên',
         icon: <IoMdContacts />,
       },
       {
         name: 'Students',
+        title: 'Sinh Viên',
         icon: <RiContactsLine />,
       },
     ],
@@ -501,10 +503,12 @@ export const links = [
     links: [
       {
         name: 'News',
+        title: 'Tin Tức',
         icon: <AiOutlineCalendar />,
       },
       {
         name: 'Notification',
+        title: 'Thông Báo',
         icon: <BsKanban />,
       },
       // {

@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { Footer, ThemeSettings } from "./components";
@@ -30,6 +29,10 @@ const App = () => {
   const { setCurrentColor, setCurrentMode, currentMode, themeSettings } =
     useStateContext();
 
+    const userID = localStorage.getItem("accessToken")
+    ? localStorage.getItem("accessToken")
+    : null;
+
   useEffect(() => {
     const currentThemeColor = localStorage.getItem("colorMode");
     const currentThemeMode = localStorage.getItem("themeMode");
@@ -37,10 +40,8 @@ const App = () => {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-  }, []);
-  const userID = localStorage.getItem("accessToken")
-    ? localStorage.getItem("accessToken")
-    : null;
+  }, [userID]);
+ 
 
   return (
     /*
@@ -52,27 +53,22 @@ const App = () => {
           <NavbarMain>
             <div>
               {themeSettings && <ThemeSettings />}
-              {userID === null ? (
-                <Login></Login>
-              ) : (
                 <Routes>
                   {/* dashboard  */}
                   <Route path="/" element={<Customers />} />
                   <Route path="/Home" element={<Ecommerce />} />
 
                   {/* pages  */}
-                  {/* <Route path="/orders" element={<Orders />} /> */}
                   <Route path="/Students" element={<Employees />} />
                   <Route path="/Teachers" element={<Customers />} />
 
                   {/* apps  */}
                   <Route path="/News" element={<News />} />
                   <Route path="/Notification" element={<Notification />} />
-                  {/* <Route path="/editor" element={<Editor />} />
-                  <Route path="/color-picker" element={<ColorPicker />} /> */}
+                  <Route path="/login" element={<Login />} />
+                  
 
                 </Routes>
-              )}
             </div>
             <Footer />
           </NavbarMain>

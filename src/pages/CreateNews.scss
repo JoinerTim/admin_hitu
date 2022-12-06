@@ -2,12 +2,23 @@
     display: flex;
     justify-content: center;
 }
+.css-1s2u09g-control, .css-1pahdxg-control{
+    flex-wrap: nowrap;
+    width: 476px;
+    min-width: 476px;
+    max-width: 476px;
+}
 
 .confirm.show {
     display: flex;
     flex-direction: column;
 }
-
+.demo-editor, .rdw-editor-toolbar{
+    border: 1px solid rgba(0,0,0,0.3);
+}
+.demo-editor{
+    height: 200px;
+}
 
 .confirm {
     display: none;
@@ -46,11 +57,11 @@
 
 }
 
-.input-hover:hover, .input-hover:focus{
-    outline: none;
-    border-color: rgba(46,105,255,.5);
-    box-shadow: 0 0 0 2px rgb(46 105 255 / 25%);
-}
+// .input-hover:hover, .input-hover:focus{
+//     outline: none;
+//     border-color: rgba(46,105,255,.5);
+//     box-shadow: 0 0 0 2px rgb(46 105 255 / 25%);
+// }
 .active-input{
     background-color: #ffffe0;
 }

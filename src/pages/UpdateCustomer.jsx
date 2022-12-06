@@ -8,11 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh, setKeyFresh }) => {
   const confirmRef = useRef();
 
-  
-  const [teacher, setTeacher] = useState({});
   const [activeInput, setActiveInput] = useState(null);
-
-  const [message,setMessenger] = useState('');
   
   const [obj,setObj] = useState({
     address: "",
@@ -33,12 +29,8 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
 
   const getTeacherData = async (userId) => {
     const {data: {address, dob, email, facultyCode, gender, id, manager, name, password, phone, remark, roleCodes}} = await TeacherAPI.getSingleTeacher(userId);
+    console.log({obj})
     setObj({...obj, address, dob, email, facultyCode, gender, id, manager, name, phone, remark, roleCodes, userId})
-    // setObj((old) => {
-    //   const constpass = {...old, password:"111111"}
-    //   return constpass
-    // })
-    // console.log(obj);
   };
  
   useEffect(() => {
@@ -64,11 +56,6 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
     confirmRef.current.classList.remove("show");
     setUpdateShow(!updateShow);
   };
-  // const handleChange = (e) => {
-
-  //   let value = e.target.value;
-  //   let name = e.target.name;
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,7 +77,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
           id: obj.id,
           manager: obj.manager,
           name: obj.name,
-          // password: obj.password,
+          password: obj.password,
           phone: obj.phone,
           remark: obj.remark,
           roleCodes: obj.roleCodes,
@@ -100,11 +87,9 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
       let resJson = await res.json();
       if( res.status === 200 ){
         setObj("");
-        // setMessenger("User created successfully");
         toast.success("Success!")
         setKeyFresh(old => old + 1)
       } else {
-        // setMessenger("Some error occured ");
         toast.error("Error!")
       }
     } catch(err){
@@ -113,8 +98,6 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
 
 
     handleClose();
-
-    // console.log(obj);
 
   }
 
@@ -137,19 +120,20 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                 alt="imgForm"
               />
               <h1 className="text-[20px] font-[600]">
-                Chỉnh Sửa Thông Tin Giáo Viênnnn
+                Chỉnh Sửa Thông Tin Giáo Viên
               </h1>
             </div>
           </div>
           <div className="border-b-[1px] border-black"></div>
           <div className="mb-[20px] flex flex-col justify-center mx-[20px]">
+            {/*name + password */}
             <div className="flex justify-center items-center">
               <div
                 className={` ${
                   activeInput == "first_1" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
-                <h3 className="mb-[12px] font-[500] text-[16px]">Họ Tên</h3>
+                <h3 className="mb-[12px] font-[600] text-[16px]">Họ Tên</h3>
                 <input
                   name="name"
                   onFocus={(e) => {
@@ -168,7 +152,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                   id="first_1"
                 />
                 <label className="font-[400] text-[11px]" htmlFor="first_1">
-                  Nguyen Van A
+                  VD: Nguyen Van A
                 </label>
               </div>
               
@@ -177,7 +161,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                   activeInput == "first_2" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
-                <h3 className="mb-[12px] font-[500] text-[16px]">
+                <h3 className="mb-[12px] font-[600] text-[16px]">
                   Số Điện Thoại
                 </h3>
                 <input
@@ -199,17 +183,18 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                   id="first_2"
                 />
                 <label className="font-[400] text-[11px]" htmlFor="first_2">
-                  0389960079
+                  VD: 0389960079
                 </label>
               </div>
             </div>
+            {/*email + role */}
             <div className="flex justify-center items-center">
               <div
                 className={` ${
                   activeInput == "first_3" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
-                <h3 className="mb-[12px] font-[500] text-[16px]">Email</h3>
+                <h3 className="mb-[12px] font-[600] text-[16px]">Email</h3>
                 <input
                 name="email"
                   onFocus={(e) => {
@@ -224,11 +209,11 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                   }}
                   onBlur={e => { setActiveInput(null);  }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
-                  type="text"
+                  type="email"
                   id="first_3"
                 />
                 <label className="font-[400] text-[11px]" htmlFor="first_3">
-                  example@example.com
+                  VD: example@example.com
                 </label>
               </div>
 
@@ -237,12 +222,21 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                   activeInput == "first_4" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
-                <h3 className="mb-[12px] font-[500] text-[16px]">
-                  Chức vụ
+                <h3 className="mb-[12px] font-[600] text-[16px]">
+                  Khoa
                 </h3>
-                <input
-                // readonly
-                  disabled
+                <select className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]" name="" >
+                  <option
+                    id="first_4"
+                    onFocus={(e) => {
+                    setActiveInput(e.target.id)
+                  }}
+                
+                  value="FIT">
+                    Công Nghệ Thông Tin
+                  </option>
+                </select>
+                {/* <input
                   onFocus={(e) => {
                     setActiveInput(e.target.id);
                   }}
@@ -252,19 +246,77 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
                   id="first_4"
-                />
+                /> */}
                 <label className="font-[400] text-[11px]" htmlFor="first_4">
-                  Giảng Viên
+                  Mặc định:Giảng Viên
                 </label>
               </div>
             </div>
+            {/*pass + address */}
             <div className="flex justify-center items-center">
+              <div
+                className={` ${
+                  activeInput == "first_6" && "active-input"
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[12px] font-[600] text-[16px]">Mật Khẩu</h3>
+                <input
+                name="password"
+                  onFocus={(e) => {
+                    setActiveInput(e.target.id);
+                  }}
+                  value={obj.password}
+                  onChange={(e) => {
+                    setObj((old) => {
+                      const newObject = {...old, password: e.target.value}
+                      return newObject
+                    })
+                  }}
+                  onBlur={e => { setActiveInput(null);  }}
+                  className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
+                  type="password"
+                  id="first_6"
+                />
+                <label className="font-[400] text-[11px]" htmlFor="first_6">
+                  VD: 12345678
+                </label>
+              </div>
+              <div
+                className={` ${
+                  activeInput == "first_5" && "active-input"
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[12px] font-[600] text-[16px]">Địa chỉ</h3>
+                <input
+                name="address"
+                  onFocus={(e) => {
+                    setActiveInput(e.target.id);
+                  }}
+                  value={obj.address}
+                  onChange={(e) => {
+                    setObj((old) => {
+                      const newObject = {...old, address: e.target.value}
+                      return newObject
+                    })
+                  }}
+                  onBlur={e => { setActiveInput(null);  }}
+                  className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
+                  type="text"
+                  id="first_5"
+                />
+                <label className="font-[400] text-[11px]" htmlFor="first_5">
+                  VD: Thành phố Hồ Chí Minh
+                </label>
+              </div>
+            </div>
+            {/* input 100% length */}
+            {/* <div className="flex justify-center items-center">
               <div
                 className={` ${
                   activeInput == "first_5" && "active-input"
                 } rounded-[3px] w-[738px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
-                <h3 className="mb-[12px] font-[500] text-[16px]">Địa chỉ</h3>
+                <h3 className="mb-[12px] font-[600] text-[16px]">Địa chỉ</h3>
                 <input
                 name="address"
                   onFocus={(e) => {
@@ -286,7 +338,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                   Thành phố Hồ Chí Minh
                 </label>
               </div>
-            </div>     
+            </div>      */}
           </div>
           <div className="border-b-[1px] border-black"></div>
           <div className="flex justify-center items-center text-center">

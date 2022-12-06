@@ -1,10 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import "./Customers.scss";
 import {getListTeacherPerPage, deleteSingleUser, deleteMutipleUser} from '../redux/toolskit/userSlice'
 import UpdateCustomer from './UpdateCustomer';
+import ConfirmDelete from './ConfirmDelete';
+import CreateCustomer from './CreateCustomer';
+import { toast } from "react-toastify";
+
 
 const DashboardUsers = () => {
   const dispatch = useDispatch();
@@ -12,12 +15,16 @@ const DashboardUsers = () => {
   const {data: users} = useSelector(state => state.userState)
 
 
-  const [keyFresh, setKeyFresh] = useState(0);
-  const [countSelected, setCountSelected] = useState(0);
-  const [arrayId, setArrayId] = useState([]);
+  const [keyFresh, setKeyFresh] = useState(0)
 
   const [updateShow, setUpdateShow] = useState(false)
+  const [createShow, setCreateShow] = useState(false)
+
+  const [deleteShow, setDeleteShow] = useState(false)
+
   const [userId, setUserId] = useState(null)
+  const [rowId, setRowId] = useState(null)
+
 
   const getData = async () => {
         await dispatch(getListTeacherPerPage({page: 1, size: 10}));
@@ -27,12 +34,15 @@ const DashboardUsers = () => {
     getData();
   }, [keyFresh]);
 
-  const handleDeleteUser = async (row) => {
+  const handleCreate = () => {
+    setCreateShow(true)
+  }
+
+  const handleDeleteUser = async (id) => {
     try {
-      await dispatch(deleteSingleUser(row.id)).unwrap();
-      setKeyFresh((oldv) => oldv + 1);
+      await fetch(`http://18.140.66.234/api/v1/teachers/toggle-status?ids=${id}`, {method: "PUT"})
+      setKeyFresh(old => old + 1)
       toast.success("Người dùng vừa được xóa thành công");
-      setCountSelected(0);
     } catch (error) {
       toast.error("Người dùng chưa được xóa!");
     }
@@ -86,7 +96,9 @@ const DashboardUsers = () => {
           <button
             className="btn-action delete-handle"
             onClick={() => {
-              handleDeleteUser(row);
+              setRowId(row.id)
+              setDeleteShow(true)
+              // handleDeleteUser(row);
             }}
           >
             Xóa
@@ -96,31 +108,6 @@ const DashboardUsers = () => {
     },
   ];
 
-  // const tableData = {
-  //   columns,
-  //   data: users,
-  // };
-
-  const handleSelectedChange = (state) => {
-    setCountSelected(state.selectedCount);
-    let array = [];
-    state.selectedRows.forEach((item, i) => {
-      array.push(item._id);
-    });
-    setArrayId(array);
-  };
-
-  const handleDeleteMutiple = async () => {
-    try {
-      await dispatch(deleteMutipleUser({ id: arrayId })).unwrap();
-      setKeyFresh((oldv) => oldv + 1);
-      toast.success("Người dùng vừa được xóa thành công");
-
-      setCountSelected(0);
-    } catch (error) {
-      toast.error("Người dùng chưa được xóa!");
-    }
-  };
   return (
     <div className="col l-10 m-[30px_50px]">
       {
@@ -132,13 +119,13 @@ const DashboardUsers = () => {
           pagination
           fixedHeader
           fixedHeaderScrollHeight="400px"
-          selectableRows
+          // selectableRows
           selectableRowsHighlight={false}
-          onSelectedRowsChange={handleSelectedChange}
+          // onSelectedRowsChange={handleSelectedChange}
           actions={
             <div>
-              <button className="btn" onClick={handleDeleteMutiple}>
-                Xóa ({countSelected}){" "}
+              <button className="btn flex items-center justify-center  outline-none p-[10px] w-[90px] h-[40px] bg-[#29d21a] rounded-[5px] text-white mr-[15px]" onClick={handleCreate}>
+                Tạo
               </button>
             </div>
           }
@@ -147,8 +134,11 @@ const DashboardUsers = () => {
         // </DataTableExtensions>
       }
       <UpdateCustomer updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <CreateCustomer createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <ConfirmDelete onClick={() => {handleDeleteUser(rowId)}} deleteShow={deleteShow} setDeleteShow={setDeleteShow} />
     </div>
   );
 };
+
 
 export default DashboardUsers;
