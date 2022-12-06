@@ -328,7 +328,7 @@ const UpdateNotification = ({
               <div
                 className={`${
                   activeInput == "create_4" && "active-input"
-                } rounded-[3px] w-[500px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
                   Khoa truyền thông báo
@@ -348,7 +348,7 @@ const UpdateNotification = ({
               <div
                 className={`${
                   activeInput == "create_4" && "active-input"
-                } rounded-[3px] w-[500px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
                   Mã nhóm truyền thông báo
@@ -365,7 +365,7 @@ const UpdateNotification = ({
               <div
                 className={`${
                   activeInput == "create_4" && "active-input"
-                } rounded-[3px] w-[500px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
                   Lớp truyền thông báo
