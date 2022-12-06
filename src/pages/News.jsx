@@ -71,8 +71,8 @@ const columns = [
     cell: row => <img className='h-[45px] w-[45px] rounded-[3px]' height="45px" width="45px" alt="thumbnail" src={`http://18.140.66.234${row.thumbnail}`} />,
     width:"150px",
     style: {
-      height: '72px', // override the row height
-  },
+      height: '72px', 
+    },
   },
   {
     name: "Tiêu Đề",

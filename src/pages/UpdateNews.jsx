@@ -5,6 +5,7 @@ import updateFormImg from "../assests/updateForm.png";
 import { toast } from "react-toastify";
 import axios from "axios";
 
+
 import {
   EditorState,
   convertToRaw,
@@ -14,6 +15,7 @@ import {
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
+import Select from "react-select";
 
 const UpdateNews = ({
   updateShow,
@@ -28,24 +30,13 @@ const UpdateNews = ({
   // console.log(draftToHtml(convertToRaw(editorState.getCurrentContent())))
   const [file, setFile] = useState({name: "Chọn ảnh"});
 
-  const [news, setNews] = useState({});
   const [activeInput, setActiveInput] = useState(null);
-  const [obj, setObj] = useState({
-    id: "",
-    content: "",
-    createdBy: "",
-    createdDate: "",
-    modifiedBy: "",
-    modifiedDate: "",
-    shortDescription: "",
-    slug: "",
-    status: "",
-    thumbnail: "",
-    title: "",
-  });
+  const [obj, setObj] = useState({});
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  const [options, setOptions] = useState([]);
+  const [optionSelected, setOptionSelected] = useState(null);
 
   const getNewsData = async (newsId) => {
     const {
@@ -58,11 +49,24 @@ const UpdateNews = ({
     );
     setObj({ ...obj, id, content, shortDescription, slug, thumbnail, title });
   };
+
+  const getFaculty = async () => {
+    const { data } = await axios.get(
+      "http://18.140.66.234/api/v1/faculties/all?status=true"
+    );
+    let optionForFaculty = [];
+    data.forEach((item) => {
+      optionForFaculty.push({ value: item.code, label: item.name });
+    });
+    setOptions(optionForFaculty);
+  };
+
   useEffect(() => {
     if (newsId) {
       getNewsData(newsId);
     }
-  }, [newsId]);
+    getFaculty();
+  }, [newsId, updateShow]);
 
   const handleDisplay = () => {
     if (updateShow) {
@@ -91,10 +95,18 @@ const UpdateNews = ({
     var bodyFormData = new FormData();
     bodyFormData.append('file', file); 
 
+    const facultyCodes = () => {
+      let stringFaculty = "";
+      optionSelected.map((item, i) => {
+        stringFaculty += "facultyCodes" + "=" + item.value + "&";
+      });
+      return stringFaculty;
+    };
+    const facultyUrl = facultyCodes();
+
     try {
-      await axios.put("http://18.140.66.234/api/v1/news?" + new URLSearchParams({
+      await axios.put(`http://18.140.66.234/api/v1/news?${facultyUrl}` + new URLSearchParams({
           content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
-          facultyCode: obj.facultyCode,
           id: obj.id,
           shortDescription: obj.shortDescription,
           title: obj.title,
@@ -103,9 +115,10 @@ const UpdateNews = ({
         setObj("");
         handleClose();
         setKeyFresh((old) => old + 1);
-        toast.success("successfully!");
+        toast.success("Tin tức vừa được cập nhật thành công!");
     } catch (err) {
-      console.log(err);
+      toast.error("Tin tức chưa được cập nhật")
+      console.log(err)
     }
   };
 
@@ -163,9 +176,6 @@ const UpdateNews = ({
                   type="text"
                   id="first_1"
                 />
-                <label className="font-[400] text-[11px]" htmlFor="first_1">
-                  {news.title}
-                </label>
               </div>
               <div
                 className={`${
@@ -195,40 +205,58 @@ const UpdateNews = ({
                   type="text"
                   id="first_2"
                 />
-                <label className="font-[400] text-[11px]" htmlFor="first_2">
-                  {news.shortDescription}
-                </label>
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div
                 className={`${
                   activeInput == "first_4" && "active-input"
-                } rounded-[3px] w-[736px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="file_input"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mb-[12px] font-[500] text-[16px]"
+                  htmlFor="file_inputCreate"
                 >
-                  Tải Ảnh
+                  Tải ảnh
                 </label>
-                <label htmlFor="file_input" className="flex items-center justify-center h-[40px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
-                <input
-                  name="thumbnail"
-                  accept="png,jpeg,jpg"
-                  onFocus={(e) => {
-                    setActiveInput(e.target.id);
+                <label
+                  htmlFor="file_inputCreate"
+                  className="w-[348px] flex items-center justify-center h-[40px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                >
+                  <input
+                    name="thumbnail"
+                    accept="png,jpeg,jpg"
+                    onFocus={(e) => {
+                      setActiveInput(e.target.id);
+                    }}
+                    onChange={handleFileChange}
+                    onBlur={(e) => {
+                      setActiveInput(null);
+                    }}
+                    className="hidden "
+                    id="file_inputCreate"
+                    type="file"
+                  />
+                  {file?.name !== "Chọn ảnh" ? "1 Đã Chọn" : file.name}
+                </label>
+              </div>
+              <div
+                className={`${
+                  activeInput == "create_4" && "active-input"
+                } rounded-[3px] w-[500px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[9px] font-[500] text-[16px]">
+                  Khoa truyền thông báo
+                </h3>
+
+                <Select
+                  isMulti
+                  defaultValue={optionSelected}
+                  onChange={(option) => {
+                    setOptionSelected(option);
                   }}
-                  onChange={handleFileChange}
-                  onBlur={(e) => {
-                    setActiveInput(null);
-                  }}
-                  className="hidden "
-                  id="file_input"
-                  type="file"
+                  options={options}
                 />
-                {file.name}
-                </label>
               </div>
             </div>
             <div className="flex justify-center items-center">

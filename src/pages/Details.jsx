@@ -40,9 +40,9 @@ const Details = ({detailShow, setDetailShow, rowId, setRowId, getSingleData}) =>
           </div>
           <h1 className='font-[700] text-[25px]'>{datas.title}</h1>
           <h3 className='font-[600] text-start text-[17px]'>{datas.shortDescription}</h3>
-          <div className='flex justify-center items-center w-[100%] h-[400px]'>
+          {/* <div className='flex justify-center items-center w-[100%] h-[400px]'>
             <img className='align-middle w-[400px] h-[350px]' src={`http://18.140.66.234${datas.thumbnail}`}  alt="thumbnail" />
-          </div>
+          </div> */}
           <div className='mt-[20px] text-start'>
           <Markup className='font-[400] text-start text-[13px]' content={datas.content} />
           </div>

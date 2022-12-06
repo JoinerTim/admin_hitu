@@ -10,6 +10,8 @@ import CreateNotification from './CreateNoti';
 import Details from './Details';
 import ConfirmDelete from './ConfirmDelete';
 import pencil from ".././assests/pencil.svg";
+import { EditorState, ContentState, convertFromHTML } from 'draft-js';
+
 
 
 const Notification = () =>{
@@ -53,33 +55,48 @@ const handleDeleteNotification = async (id) => {
   }
 };
 
+const htmlToDraftBlocks = (html) => {
+  const blocksFromHTML = convertFromHTML(html);
+  const state = ContentState.createFromBlockArray(
+    blocksFromHTML.contentBlocks,
+    blocksFromHTML.entityMap,
+  );
+  const editor = EditorState.createWithContent(
+    state
+  )
+
+  return editor.getCurrentContent().getPlainText()
+ }
+
 const columns = [
   {
-    name: "Ngày Tạo",
-    selector: (row) => row.createdDate.slice(0,10),
-    sortable: true,
-    width:"250px"
+    name: "Hình Ảnh",
+    cell: row => <img className='h-[45px] w-[45px] rounded-[3px]' height="45px" width="45px" alt="thumbnail" src={`http://18.140.66.234${row.thumbnail}`} />,
+    width:"150px",
+    style: {
+      height: '72px', 
+    },
   },
   {
-    name: "Title",
+    name: "Tiêu Đề",
     selector: (row) => row.title,
     sortable: true,
     width:"200px"
   },
   {
-    name: "Nội dung",
-    selector: (row) => row.content,
-    sortable: true,
-    width:"200px"
-  },
-  {
-    name: "ShortDescription",
+    name: "Mô Tả Ngắn",
     selector: (row) => row.shortDescription,
     sortable: true,
     width:"300px"
   },
   {
-    name: "Actions",
+    name: "Nội dung",
+    selector: (row) => htmlToDraftBlocks(row.content.toString()),
+    sortable: true,
+    width:"300px"
+  },
+  {
+    name: "Chức Năng",
     selector: (row) => (
       <div className="action--item flex items-center justify-center relative">
         <button
@@ -128,8 +145,8 @@ const columns = [
           pagination
           fixedHeader
           fixedHeaderScrollHeight="400px"
-          selectableRows
-          selectableRowsHighlight={false}
+          // selectableRows
+          // selectableRowsHighlight={false}
           actions={
             <div>
               <button className="btn flex items-center justify-center  outline-none p-[10px] w-[90px] h-[40px] bg-[#29d21a] rounded-[5px] text-white mr-[15px]" onClick={() =>{setCreateShow(true)}}>

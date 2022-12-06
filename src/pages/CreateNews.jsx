@@ -3,31 +3,24 @@ import "./CreateNews.scss";
 import updateFormImg from "../assests/updateForm.png";
 import { toast } from "react-toastify";
 import axios from "axios";
-import {
-  EditorState,
-  convertToRaw,
-} from "draft-js";
+import { EditorState, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
-import Select from 'react-select';
-import Test from "./Test";
-
-
+import Select from "react-select";
 
 const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
   const confirmRef = useRef();
   const [file, setFile] = useState({ name: "Chọn ảnh" });
-  const [options, setOptions] = useState([])
-  const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty()
-  );
-
   const [activeInput, setActiveInput] = useState(null);
   const [obj, setObj] = useState({});
-  const [faculty,setFaculty] = useState([]);
-  const [optionSelected, setOptionSelected] = useState(null)
 
+  const [editorState, setEditorState] = useState(() =>
+  EditorState.createEmpty()
+  );
+
+  const [options, setOptions] = useState([]);
+  const [optionSelected, setOptionSelected] = useState(null);
 
   const handleDisplay = () => {
     if (createShow) {
@@ -35,19 +28,22 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
     }
   };
   handleDisplay();
+
+  const getFaculty = async () => {
+    const { data } = await axios.get(
+      "http://18.140.66.234/api/v1/faculties/all?status=true"
+    );
+    let optionForFaculty = [];
+    data.forEach((item) => {
+      optionForFaculty.push({ value: item.code, label: item.name });
+    });
+    setOptions(optionForFaculty);
+  };
+  
   useEffect(() => {
-    getFaculty()
+    getFaculty();
   }, [createShow]);
 
-  const getFaculty = async() => {
-    const {data} = await axios.get("http://18.140.66.234/api/v1/faculties/all?status=true")
-    let optionForFaculty = []
-    data.forEach((item) => {
-      optionForFaculty.push({value: item.code, label: item.name})
-    })
-    setOptions(optionForFaculty)
-    setFaculty(data)
-  }
 
   const handleClose = () => {
     setActiveInput(null);
@@ -60,7 +56,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${JSON.parse(
+        "Authorization": `Bearer ${JSON.parse(
           localStorage.getItem("accessToken")
         )}`,
       },
@@ -69,19 +65,18 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
     var bodyFormData = new FormData();
     bodyFormData.append("file", file);
 
-    const facultyCodes = () => {
-      let stringFaculty = ""
-      optionSelected.map((item, i) => {
-        stringFaculty += "facultyCodes" + '=' + item.value + "&";
-      })
-      return stringFaculty
-    }
-    const facultyUrl = facultyCodes()
-
+    // const facultyCodes = () => {
+    //   let stringFaculty = "";
+    //   optionSelected.map((item, i) => {
+    //     stringFaculty += "facultyCodes" + "=" + item.value + "&";
+    //   });
+    //   return stringFaculty;
+    // };
+    // const facultyUrl = facultyCodes();
 
     try {
       await axios.post(
-        `http://18.140.66.234/api/v1/news?${facultyUrl}` +
+        `http://18.140.66.234/api/v1/news?` +
           new URLSearchParams({
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
             shortDescription: obj.shortDescription,
@@ -94,9 +89,10 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
       setObj("");
       setKeyFresh((old) => old + 1);
       handleClose();
-      toast.success("successfully!");
+      toast.success("Tin Tức Vừa Được Tạo Thành Công!");
     } catch (err) {
-      toast.error("error!");
+      toast.error("Tin Tức Chưa Được Tạo!");
+      console.log(err)
     }
   };
 
@@ -158,9 +154,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                   activeInput == "first_2" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
-                <h3 className="mb-[12px] font-[500] text-[16px]">
-                  Mô Tả Ngắn
-                </h3>
+                <h3 className="mb-[12px] font-[500] text-[16px]">Mô Tả Ngắn</h3>
                 <input
                   name="ShortDescription"
                   onFocus={(e) => {
@@ -189,48 +183,54 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
               <div
                 className={`${
                   activeInput == "first_4" && "active-input"
-                } rounded-[3px] w-[238px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mb-[12px] font-[500] text-[16px]" 
-                  htmlFor="file_inputCreate"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mb-[12px] font-[500] text-[16px]"
+                  htmlFor="file_inputCreateNew"
                 >
                   Tải ảnh
                 </label>
-                <label htmlFor="file_inputCreate" className="flex items-center justify-center h-[40px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
-                <input
-                  name="thumbnail"
-                  accept="png,jpeg,jpg"
-                  onFocus={(e) => {
-                    setActiveInput(e.target.id);
-                  }}
-                  onChange={handleFileChange}
-                  onBlur={(e) => {
-                    setActiveInput(null);
-                  }}
-                  className="hidden "
-                  id="file_inputCreate"
-                  type="file"
-                />
-                {file?.name !== "Chọn ảnh" ? "1 Đã Chọn" : file.name}
+                <label
+                  htmlFor="file_inputCreateNew"
+                  className="w-[348px] flex items-center justify-center h-[40px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                >
+                  <input
+                    name="thumbnail"
+                    accept="png,jpeg,jpg"
+                    onFocus={(e) => {
+                      setActiveInput(e.target.id);
+                    }}
+                    onChange={handleFileChange}
+                    onBlur={(e) => {
+                      setActiveInput(null);
+                    }}
+                    className="hidden "
+                    id="file_inputCreateNew"
+                    type="file"
+                  />
+                  {file?.name !== "Chọn ảnh" ? "1 Đã Chọn" : file.name}
                 </label>
               </div>
               <div
-              className={`${
-                activeInput == "create_4" && "active-input"
-              } rounded-[3px] w-[500px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
-            >
-              <h3 className="mb-[9px] font-[500] text-[16px]">
-                Khoa
-              </h3>
+                className={`${
+                  activeInput == "create_4" && "active-input"
+                } rounded-[3px] w-[500px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[9px] font-[500] text-[16px]">
+                  Khoa truyền thông báo
+                </h3>
 
-              <Select
-                isMulti
-                defaultValue={optionSelected}
-                onChange={(option) => {setOptionSelected(option); console.log(option)}}
-                options={options}
-              />
-            </div>
+                <Select
+                  isMulti
+                  defaultValue={optionSelected}
+                  onChange={(option) => {
+                    setOptionSelected(option);
+                    console.log(option);
+                  }}
+                  options={options}
+                />
+              </div>
             </div>
             {/*noi dung */}
             <div className="flex justify-center items-center">
