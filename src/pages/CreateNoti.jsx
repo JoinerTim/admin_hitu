@@ -17,7 +17,6 @@ const CreateNotification = ({
 }) => {
   const confirmRef = useRef();
 
-  const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [activeInput, setActiveInput] = useState(null);
@@ -94,7 +93,6 @@ const CreateNotification = ({
   }, [keyFresh, createShow]);
 
   const handleClose = () => {
-    setContent("");
     setTitle("");
     setShortDescription("");
     setActiveInput(null);
@@ -112,6 +110,37 @@ const CreateNotification = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if(title.length === 0) {
+      toast.error("Tiêu đề không được để trống!")
+      return 0;
+    }
+    if(shortDescription.length === 0) {
+      toast.error("Mô tả ngắn không được để trống!")
+      return 0;
+    }
+    if(file.name === "Chọn ảnh") {
+      toast.error("Vui lòng chọn ảnh!")
+      return 0;
+    }
+    if(editorState.getCurrentContent().getPlainText().length === 0) {
+      toast.error("Nội dung không được để trống!")
+      return 0;
+    }
+
+    if(!facultyOptionSelected || facultyOptionSelected?.length === 0) {
+      toast.error("Chọn Khoa để gửi thông báo!")
+      return 0;
+    }
+    if(!notifyCationGroupCodeOptionSelected) {
+      toast.error("Chọn nhóm để gửi thông báo!")
+      return 0;
+    }
+    if(!classesCodeOptionSelected) {
+      toast.error("Chọn lớp để gửi thông báo!")
+      return 0;
+    }
+
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -179,7 +208,7 @@ const CreateNotification = ({
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "first_1" && "active-input"
+                  activeInput == "create_noties_1" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Tiêu Đề</h3>
@@ -197,12 +226,12 @@ const CreateNotification = ({
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="first_1"
+                  id="create_noties_1"
                 />
               </div>
               <div
                 className={`${
-                  activeInput == "first_2" && "active-input"
+                  activeInput == "create_noties_2" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Mô Tả Ngắn</h3>
@@ -220,14 +249,14 @@ const CreateNotification = ({
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="first_2"
+                  id="create_noties_2"
                 />
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div
                 className={`${
-                  activeInput == "first_4" && "active-input"
+                  activeInput == "create_noties_3" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <label
@@ -259,7 +288,7 @@ const CreateNotification = ({
               </div>
               <div
                 className={`${
-                  activeInput == "create_4" && "active-input"
+                  activeInput == "create_noties_4" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -268,7 +297,7 @@ const CreateNotification = ({
 
                 <Select
                   isMulti
-                  defaultValue={facultyOptionSelected}
+                  defaultValue={facultyOptions}
                   onChange={(option) => {
                     setFacultyOptionSelected(option);
                   }}
@@ -279,7 +308,7 @@ const CreateNotification = ({
             <div className="flex justify-center items-center">
               <div
                 className={`${
-                  activeInput == "create_4" && "active-input"
+                  activeInput == "create_noties_5" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -296,7 +325,7 @@ const CreateNotification = ({
               </div>
               <div
                 className={`${
-                  activeInput == "create_4" && "active-input"
+                  activeInput == "create_noties_6" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -316,7 +345,7 @@ const CreateNotification = ({
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "first_3" && "active-input"
+                  activeInput == "create_noties_7" && "active-input"
                 } rounded-[3px] w-[730px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Nội Dung</h3>
@@ -330,7 +359,7 @@ const CreateNotification = ({
                 />
                 <label
                   className="font-[400] text-[11px]"
-                  htmlFor="first_3"
+                  htmlFor="create_noties_7"
                 ></label>
               </div>
             </div>

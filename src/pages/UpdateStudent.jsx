@@ -4,106 +4,141 @@ import "./UpdateCustomer.scss";
 import updateFormImg from "../assests/updateForm.png";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import uuid from 'react-uuid';
 import axios from "axios";
-const CreateCustomer = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
-    const confirmRef = useRef();
 
-    const [faculty,setFaculty] = useState([]);
-    const [facultySelected, setFacultySelected] = useState("")
-    const [activeInput, setActiveInput] = useState(null);
-    
-    const [obj,setObj] = useState({phone: "", name: "", email: "", address: "", password: ""})
+const UpdateStudent = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh, setKeyFresh }) => {
+  const confirmRef = useRef();
+
+  const [classCode, setClassCode] = useState([]);
+  const [classCodeSelected, setClassCodeSelected] = useState("")
+  const [activeInput, setActiveInput] = useState(null);
+  
+  const [obj,setObj] = useState({
+    address: "",
+    dob: "",
+    email: "",
+    gender: "",
+    name: "",
+    password: "",
+    phone: "",
+    remark: "",
+    userId: "",
+  })
 
 
-    const getFaculty = async() => {
-      const {data} = await axios.get("http://18.140.66.234/api/v1/faculties/all?status=true")
-      setFaculty(data)
+  const getTeacherData = async (userId) => {
+    const {data: {address, dob, email, classCode, gender, id, name, phone, remark}} = await axios.get(`http://18.140.66.234/api/v1/students?userId=${userId}`);
+    setObj({...obj, address, dob, email, classCode, gender, id, name, phone, remark, userId})
+  };
+
+  const getClassCode = async() => {
+    const config = {
+      headers: {
+        "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`
+      },
+    };
+    const {data: {data}} = await axios.get("http://18.140.66.234/api/v1/classes/page?page=1&size=10", config)
+    setClassCode(data)
+  }
+
+ 
+  useEffect(() => {
+    if (userId) {
+      getTeacherData(userId);
+      getClassCode()
     }
 
-    useEffect(() => {
-      getFaculty()
-    }, [])
+  }, [userId, keyFresh, updateShow]);
+
+
 
 
   const handleDisplay = () => {
-    if (createShow) {
+    if (updateShow) {
       confirmRef.current.classList.add("show");
     }
   };
   handleDisplay();
+  useEffect(() => {}, [updateShow]);
 
   const handleClose = () => {
     setActiveInput(null);
+    setUserId(null);
     confirmRef.current.classList.remove("show");
-    setCreateShow(!createShow);
+    setUpdateShow(!updateShow);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (obj.name.length <= 3) {
+      toast.error("Tên sinh viên không được bé hơn 4 kí tự!");
+      return 0;
+    }
+    if (!obj.phone.match(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g)) {
+      toast.error("Vui lòng nhập số điện thoại hợp lệ!");
+      return 0;
+    }
+    if (
+      !obj.email.match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      )
+    ) {
+      toast.error("Vui lòng nhập Email hợp lệ!");
+      return 0;
+    }
+    if (classCodeSelected === "") {
+      toast.error("Vui lòng chọn Lớp!");
+      return 0;
+    }
+    if (obj.password?.length <= 7) {
+      toast.error("Mật khẩu không được bé hơn 8 kí tự!");
+      return 0;
+    }
+    if (obj.address === "") {
+      toast.error("Địa chỉ không được để trống!");
+      return 0;
+    }
+
     var date = new Date();
-	  var current_date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+ (date.getDate() > 9 ? date.getDate() : "0"+date.getDate());
-
-    if(obj.name.length <=3) {
-      toast.error("Tên giáo viên không được bé hơn 4 kí tự!")
-      return 0
-    }
-    if(!obj.phone.match(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g)){
-      toast.error("Vui lòng nhập số điện thoại hợp lệ!")
-      return 0
-    }
-    if(!obj.email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))
-    {
-      toast.error("Vui lòng nhập Email hợp lệ!")
-      return 0
-    }
-    if(obj.password.length<=7) {
-      toast.error("Mật khẩu không được bé hơn 8 kí tự!")
-      return 0
-    }
-    if(obj.address === "") {
-      toast.error("Địa chỉ không được để trống!")
-      return 0
-    }
-    if(facultySelected==="") {
-      toast.error("Vui lòng chọn khoa!")
-      return 0
-    }
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`
-      },
-    };
+    var current_date = date.getFullYear()+"-"+(date.getMonth()+1 > 9 ? date.getMonth()+1 : "0"+(date.getMonth()+1))+"-"+ (date.getDate() > 9 ? date.getDate() : "0"+date.getDate());
    
     try{
-        await axios.post("http://18.140.66.234/api/v1/teachers", {
-        address: obj.address,
-        dob: current_date,
-        email: obj.email,
-        facultyCode: facultySelected,
-        gender: true,
-        manager: true,
-        name: obj.name,
-        remark: "",
-        password: obj.password,
-        phone: obj.phone,
-        roleCodes: [],
-        userId: "GV" + uuid().slice(0, 16),}, config)
+      await fetch("http://18.140.66.234/api/v1/students",{
+        headers: {
+        "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+      'Content-Type': 'application/json',
 
-        setObj({});
-        toast.success("Success!")
+    },
+        method:"PUT",
+        body:JSON.stringify({
+          address: obj.address,
+          dob: current_date,
+          email: obj.email,
+          classCode: classCodeSelected,
+          gender: obj.gender,
+          id: obj.id,
+          name: obj.name,
+          password: obj.password,
+          phone: obj.phone,
+          remark: "",
+          userId:obj.userId,
+        }),
+      });
+
+        setObj("");
+        toast.success("Cập nhật Sinh Viên thành công!")
         setKeyFresh(old => old + 1)
-       
     } catch(err){
-      toast.error(err.response.data.message)
+      toast.error(err)
+      console.log(err);
     }
+
 
     handleClose();
 
   }
+
 
 
 
@@ -123,7 +158,7 @@ const CreateCustomer = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) =>
               alt="imgForm"
             />
             <h1 className="text-[20px] font-[600]">
-              Chỉnh Sửa Thông Tin Giáo Viên
+              Chỉnh Sửa Thông Tin Sinh Viên
             </h1>
           </div>
         </div>
@@ -226,21 +261,22 @@ const CreateCustomer = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) =>
               } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
             >
               <h3 className="mb-[12px] font-[600] text-[16px]">
-                Khoa
+                Lớp
               </h3>
               <select 
               onFocus={(e) => {
                 setActiveInput(e.target.id)
               }}
               onChange={(e) => {
-                setFacultySelected(e.target.value)
+                setClassCodeSelected(e.target.value)
               }}
               className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]" name="" >
-                <option
-                    value="">Chọn khoa
+                  <option
+                    value="">
+                      Chọn lớp
                   </option>
                 {
-                  faculty.map((item, i) => (
+                  classCode?.map((item, i) => (
                     <option
                     key={i}
                     value={item.code}>
@@ -250,7 +286,7 @@ const CreateCustomer = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) =>
                 }
               </select>
               <label className="font-[400] text-[11px]" htmlFor="create_4">
-                Mặc định: Công Nghệ Thông Tin
+                Vui lòng chọn lớp
               </label>
             </div>
           </div>
@@ -319,7 +355,7 @@ const CreateCustomer = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) =>
       </div>
     </form>
   </div>
-  )
-}
+  );
+};
 
-export default CreateCustomer
+export default UpdateStudent;

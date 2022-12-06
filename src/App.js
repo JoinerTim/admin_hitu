@@ -19,6 +19,7 @@ import {
   ColorPicker,
   ColorMapping,
   Editor,
+  Student,
   NavbarMain,
 } from "./pages";
 import "./App.css";
@@ -59,7 +60,7 @@ const App = () => {
                   <Route path="/Home" element={<Ecommerce />} />
 
                   {/* pages  */}
-                  <Route path="/Students" element={<Employees />} />
+                  <Route path="/Students" element={<Student />} />
                   <Route path="/Teachers" element={<Customers />} />
 
                   {/* apps  */}

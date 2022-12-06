@@ -13,14 +13,14 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
   const confirmRef = useRef();
   const [file, setFile] = useState({ name: "Chọn ảnh" });
   const [activeInput, setActiveInput] = useState(null);
-  const [obj, setObj] = useState({});
+  const [obj, setObj] = useState({title: "", content: "", shortDescription: ""});
 
   const [editorState, setEditorState] = useState(() =>
   EditorState.createEmpty()
   );
 
   const [options, setOptions] = useState([]);
-  const [optionSelected, setOptionSelected] = useState(null);
+  const [optionSelected, setOptionSelected] = useState([]);
 
   const handleDisplay = () => {
     if (createShow) {
@@ -34,6 +34,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
       "http://18.140.66.234/api/v1/faculties/all?status=true"
     );
     let optionForFaculty = [];
+    optionForFaculty.push({value: "", label: "Tất Cả"})
     data.forEach((item) => {
       optionForFaculty.push({ value: item.code, label: item.name });
     });
@@ -53,6 +54,30 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(obj.title==="") {
+      toast.error("Tiêu đề không được để trống!")
+      return 0;
+    }
+    if(obj.title.length >= 150) {
+      toast.error("Tiêu đề không được lớn hơn 150 kí tự!")
+      return 0;
+    }
+    if(obj.shortDescription ==="") {
+      toast.error("Mô tả ngắn không được để trống!")
+      return 0;
+    }
+    if(file.name === "Chọn ảnh") {
+      toast.error("Vui lòng chọn ảnh!")
+      return 0;
+    }
+    if(obj.shortDescription.length >= 255) {
+      toast.error("Mô tả ngắn không được lớn hơn 255 kí tự!")
+      return 0;
+    }
+    if(editorState.getCurrentContent().getPlainText().length === 0) {
+      toast.error("Nội dung không được để trống!")
+      return 0;
+    }
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -65,18 +90,21 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
     var bodyFormData = new FormData();
     bodyFormData.append("file", file);
 
-    // const facultyCodes = () => {
-    //   let stringFaculty = "";
-    //   optionSelected.map((item, i) => {
-    //     stringFaculty += "facultyCodes" + "=" + item.value + "&";
-    //   });
-    //   return stringFaculty;
-    // };
-    // const facultyUrl = facultyCodes();
+    const facultyCodes = () => {
+      if(optionSelected?.length > 0 ){
+        let stringFaculty = "";
+        optionSelected.map((item, i) => {
+          stringFaculty += "facultyCodes" + "=" + item.value + "&";
+        });
+        return stringFaculty;
+      }
+      return ""
+    };
+    const facultyUrl = facultyCodes();
 
     try {
       await axios.post(
-        `http://18.140.66.234/api/v1/news?` +
+        `http://18.140.66.234/api/v1/news?${facultyUrl}` +
           new URLSearchParams({
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
             shortDescription: obj.shortDescription,
@@ -91,8 +119,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
       handleClose();
       toast.success("Tin Tức Vừa Được Tạo Thành Công!");
     } catch (err) {
-      toast.error("Tin Tức Chưa Được Tạo!");
-      console.log(err)
+      toast.error(err.response.data.message);
     }
   };
 
@@ -125,7 +152,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "first_1" && "active-input"
+                  activeInput == "create_news_1" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Tiêu Đề</h3>
@@ -146,12 +173,12 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="first_1"
+                  id="create_news_1"
                 />
               </div>
               <div
                 className={`${
-                  activeInput == "first_2" && "active-input"
+                  activeInput == "create_news_2" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Mô Tả Ngắn</h3>
@@ -175,14 +202,14 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="first_2"
+                  id="create_news_2"
                 />
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div
                 className={`${
-                  activeInput == "first_4" && "active-input"
+                  activeInput == "create_news_3" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <label
@@ -214,7 +241,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
               </div>
               <div
                 className={`${
-                  activeInput == "create_4" && "active-input"
+                  activeInput == "create_news_4" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -223,20 +250,18 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
 
                 <Select
                   isMulti
-                  defaultValue={optionSelected}
+                  defaultValue={{ label: "Tất cả", value: "" }}
                   onChange={(option) => {
                     setOptionSelected(option);
-                    console.log(option);
                   }}
                   options={options}
                 />
               </div>
             </div>
-            {/*noi dung */}
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "first_3" && "active-input"
+                  activeInput == "create_news_5" && "active-input"
                 } rounded-[3px] w-[730px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Nội Dung</h3>
@@ -250,7 +275,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                 />
                 <label
                   className="font-[400] text-[11px]"
-                  htmlFor="first_3"
+                  htmlFor="create_news_5"
                 ></label>
               </div>
             </div>

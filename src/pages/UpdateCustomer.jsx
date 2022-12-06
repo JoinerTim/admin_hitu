@@ -4,11 +4,14 @@ import "./UpdateCustomer.scss";
 import updateFormImg from "../assests/updateForm.png";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from "axios";
 
 const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh, setKeyFresh }) => {
   const confirmRef = useRef();
 
   const [activeInput, setActiveInput] = useState(null);
+  const [faculty,setFaculty] = useState([]);
+  const [facultySelected, setFacultySelected] = useState("")
   
   const [obj,setObj] = useState({
     address: "",
@@ -26,18 +29,22 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
     userId: "",
   })
 
+  const getFaculty = async() => {
+    const {data} = await axios.get("http://18.140.66.234/api/v1/faculties/all?status=true")
+    setFaculty(data)
+  }
 
   const getTeacherData = async (userId) => {
     const {data: {address, dob, email, facultyCode, gender, id, manager, name, password, phone, remark, roleCodes}} = await TeacherAPI.getSingleTeacher(userId);
-    console.log({obj})
     setObj({...obj, address, dob, email, facultyCode, gender, id, manager, name, phone, remark, roleCodes, userId})
   };
  
   useEffect(() => {
     if (userId) {
       getTeacherData(userId);
+      getFaculty()
     }
-  }, [userId, keyFresh]);
+  }, [userId, keyFresh, updateShow]);
 
 
 
@@ -48,7 +55,6 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
     }
   };
   handleDisplay();
-  useEffect(() => {}, [updateShow]);
 
   const handleClose = () => {
     setActiveInput(null);
@@ -59,8 +65,31 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(obj);
-   
+    if(obj.name.length <=3) {
+      toast.error("Tên giáo viên không được bé hơn 4 kí tự!")
+      return 0
+    }
+    if(!obj.phone.match(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g)){
+      toast.error("Vui lòng nhập số điện thoại hợp lệ!")
+      return 0
+    }
+    if(!obj.email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))
+    {
+      toast.error("Vui lòng nhập Email hợp lệ!")
+      return 0
+    }
+    if(obj.password.length<=7) {
+      toast.error("Mật khẩu không được bé hơn 8 kí tự!")
+      return 0
+    }
+    if(obj.address === "") {
+      toast.error("Địa chỉ không được để trống!")
+      return 0
+    }
+    if(facultySelected==="") {
+      toast.error("Vui lòng chọn khoa!")
+      return 0
+    }
     try{
       let res = await fetch("http://18.140.66.234/api/v1/teachers",{
         headers: {
@@ -72,7 +101,7 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
           address: obj.address,
           dob: obj.dob,
           email: obj.email,
-          facultyCode: obj.facultyCode,
+          facultyCode: facultySelected,
           gender: obj.gender,
           id: obj.id,
           manager: obj.manager,
@@ -81,22 +110,15 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
           phone: obj.phone,
           remark: obj.remark,
           roleCodes: obj.roleCodes,
-          userId:obj,userId,
+          userId:obj.userId,
         }),
       });
-      let resJson = await res.json();
-      if( res.status === 200 ){
         setObj("");
-        toast.success("Success!")
+        toast.success("Cập nhật Giáo Viên thành công!")
         setKeyFresh(old => old + 1)
-      } else {
-        toast.error("Error!")
-      }
     } catch(err){
-      console.log(err);
+      toast.success("Cập nhật Giáo Viên không thành công!")
     }
-
-
     handleClose();
 
   }
@@ -225,16 +247,26 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
                 <h3 className="mb-[12px] font-[600] text-[16px]">
                   Khoa
                 </h3>
-                <select className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]" name="" >
-                  <option
-                    id="first_4"
-                    onFocus={(e) => {
-                    setActiveInput(e.target.id)
-                  }}
-                
-                  value="FIT">
-                    Công Nghệ Thông Tin
+                <select
+                 onFocus={(e) => {
+                  setActiveInput(e.target.id)
+                }}
+                onChange={(e) => {
+                  setFacultySelected(e.target.value)
+                }}
+                className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]" name="" >
+                <option
+                      value="">Chọn khoa
                   </option>
+                {
+                  faculty.map((item, i) => (
+                    <option
+                      key={i}
+                      value={item.code}>
+                      {item.name}
+                  </option>
+                  ))
+                }
                 </select>
                 {/* <input
                   onFocus={(e) => {

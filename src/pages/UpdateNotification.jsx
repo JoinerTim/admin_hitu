@@ -238,7 +238,7 @@ const UpdateNotification = ({
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "first_1" && "active-input"
+                  activeInput == "update_noties_1" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Tiêu Đề</h3>
@@ -246,7 +246,7 @@ const UpdateNotification = ({
                   name="title"
                   value={obj.title}
                   onChange={(e) => {
-                    setObj((old) => {
+                    setObj((obj) => {
                       const newobj = { ...obj, title: e.target.value };
                       return newobj;
                     });
@@ -259,12 +259,12 @@ const UpdateNotification = ({
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="first_1"
+                  id="update_noties_1"
                 />
               </div>
               <div
                 className={`${
-                  activeInput == "first_2" && "active-input"
+                  activeInput == "update_noties_2" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Mô Tả Ngắn</h3>
@@ -275,7 +275,7 @@ const UpdateNotification = ({
                   }}
                   value={obj.shortDescription}
                   onChange={(e) => {
-                    setObj((old) => {
+                    setObj((obj) => {
                       const newobj = {
                         ...obj,
                         shortDescription: e.target.value,
@@ -288,24 +288,24 @@ const UpdateNotification = ({
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="first_2"
+                  id="update_noties_2"
                 />
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div
                 className={`${
-                  activeInput == "first_4" && "active-input"
+                  activeInput == "update_noties_3" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <label
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mb-[12px] font-[500] text-[16px]"
-                  htmlFor="file_inputCreate"
+                  htmlFor="update_noties_3"
                 >
                   Tải ảnh
                 </label>
                 <label
-                  htmlFor="file_inputCreate"
+                  htmlFor="update_noties_3"
                   className="w-[348px] flex items-center justify-center h-[40px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                 >
                   <input
@@ -319,7 +319,7 @@ const UpdateNotification = ({
                       setActiveInput(null);
                     }}
                     className="hidden "
-                    id="file_inputCreate"
+                    id="update_noties_3"
                     type="file"
                   />
                   {file?.name !== "Chọn ảnh" ? "1 Đã Chọn" : file.name}
@@ -327,7 +327,7 @@ const UpdateNotification = ({
               </div>
               <div
                 className={`${
-                  activeInput == "create_4" && "active-input"
+                  activeInput == "update_noties_4" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -347,7 +347,7 @@ const UpdateNotification = ({
             <div className="flex justify-center items-center">
               <div
                 className={`${
-                  activeInput == "create_4" && "active-input"
+                  activeInput == "update_noties_4" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -364,7 +364,7 @@ const UpdateNotification = ({
               </div>
               <div
                 className={`${
-                  activeInput == "create_4" && "active-input"
+                  activeInput == "update_noties_5" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -384,7 +384,7 @@ const UpdateNotification = ({
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "first_3" && "active-input"
+                  activeInput == "update_noties_6" && "active-input"
                 } rounded-[3px] w-[730px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Nội Dung</h3>
@@ -398,7 +398,7 @@ const UpdateNotification = ({
                 />
                 <label
                   className="font-[400] text-[11px]"
-                  htmlFor="first_3"
+                  htmlFor="update_noties_6"
                 ></label>
               </div>
             </div>
