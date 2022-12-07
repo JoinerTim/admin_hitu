@@ -89,7 +89,9 @@ const FormFaculty = ({ setView, id, code, view, setNewData }) => {
             </h1>
           </div>
         </div>
-        <div className="flex justify-center w-full">
+        <div className="border-b-[1px] border-black"></div>
+
+        <div className="flex min-h-[300px] justify-center w-full">
           <div className="flex space-x-4">
             <div className="flex flex-col">
               <label htmlFor="" className="py-2 text-start">

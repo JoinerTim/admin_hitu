@@ -9,6 +9,7 @@ const Faculty = () => {
   const [rowId, setRowId] = useState(null);
   const [code, setCode] = useState(null);
   const [view, setView] = useState("");
+  const [keyFresh, setKeyFresh] = useState(0)
   useEffect(() => {
     FacultyAPI.getPageFaculty({ page: 1 })
       .then(({ data }) => {
@@ -17,10 +18,11 @@ const Faculty = () => {
       .catch((e) => {
         toast.error("Có lỗi xảy ra");
       });
-  }, []);
+  }, [keyFresh]);
   const handleDelete = async (ids) => {
     try {
       await FacultyAPI.hiddenFaculty(ids);
+      setKeyFresh(old => old + 1)
       toast.success("Xoá thành công");
     } catch (error) {
       toast.error("Xoá khoa thất bại");

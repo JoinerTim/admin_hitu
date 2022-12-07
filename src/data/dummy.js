@@ -484,7 +484,7 @@ export const links = [
   // },
 
   {
-    title: 'Members',
+    title: 'THÀNH VIÊN',
     links: [
       {
         name: 'Teachers',
@@ -499,7 +499,7 @@ export const links = [
     ],
   },
   {
-    title: 'Pages',
+    title: 'TRANG',
     links: [
       {
         name: 'News',

@@ -9,6 +9,12 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import Select from "react-select";
 
+
+const SGOptions = [
+  {value: "0", label: "Tất Cả"}, {value: "1", label: "Giáo Viên"}, {value: "2", label: "Sinh Viên"},
+]
+
+
 const CreateNotification = ({
   createShow,
   setCreateShow,
@@ -30,9 +36,10 @@ const CreateNotification = ({
   const [classesCodeOptions, setClassesCodeOptions] = useState([]);
 
 
-  const [facultyOptionSelected, setFacultyOptionSelected] = useState(null);
-  const [notifyCationGroupCodeOptionSelected, setNotifyCationGroupCodeOptionSelected] = useState(null);
-  const [classesCodeOptionSelected, setClassesCodeOptionSelected] = useState(null);
+  const [facultyOptionSelected, setFacultyOptionSelected] = useState([{value: "", label: "Tất Cả"}]);
+  const [notifyCationGroupCodeOptionSelected, setNotifyCationGroupCodeOptionSelected] = useState([]);
+  const [classesCodeOptionSelected, setClassesCodeOptionSelected] = useState([{value: "", label: "Tất Cả"}]);
+  const [typeSelected, setTypeSelected] = useState([{value: "0", label: "Tất Cả"}])
 
 
 
@@ -48,6 +55,7 @@ const CreateNotification = ({
       "http://18.140.66.234/api/v1/notification-groups/all?status=true"
     );
     let optionForNotifyCationGC = [];
+
     data.forEach((item) => {
       optionForNotifyCationGC.push({ value: item.code, label: item.name });
     });
@@ -66,6 +74,8 @@ const CreateNotification = ({
       `http://18.140.66.234/api/v1/classes/page?page=1&size=10000`, config
     );
     let optionForClassesCode = [];
+    optionForClassesCode.push({value: "", label: "Tất Cả"})
+
     data.forEach((item) => {
       optionForClassesCode.push({ value: item.code, label: item.name });
     });
@@ -78,6 +88,7 @@ const CreateNotification = ({
       "http://18.140.66.234/api/v1/faculties/all?status=true"
     );
     let optionForFaculty = [];
+    optionForFaculty.push({value: "", label: "Tất Cả"})
     data.forEach((item) => {
       optionForFaculty.push({ value: item.code, label: item.name });
     });
@@ -103,7 +114,9 @@ const CreateNotification = ({
   const createUrlQuery = (arr, strUrl) => {
     let urlQuery = "";
     arr.map((item, i) => {
-      urlQuery += strUrl + "=" + item.value + "&";
+      if(item.value) {
+        urlQuery += strUrl + "=" + item.value + "&";
+      }
     });
     return urlQuery;
   };
@@ -128,18 +141,18 @@ const CreateNotification = ({
       return 0;
     }
 
-    if(!facultyOptionSelected || facultyOptionSelected?.length === 0) {
-      toast.error("Chọn Khoa để gửi thông báo!")
-      return 0;
-    }
-    if(!notifyCationGroupCodeOptionSelected) {
+    // if(!facultyOptionSelected || facultyOptionSelected?.length === 0) {
+    //   toast.error("Chọn Khoa để gửi thông báo!")
+    //   return 0;
+    // }
+    if(!notifyCationGroupCodeOptionSelected || notifyCationGroupCodeOptionSelected?.length === 0) {
       toast.error("Chọn nhóm để gửi thông báo!")
       return 0;
     }
-    if(!classesCodeOptionSelected) {
-      toast.error("Chọn lớp để gửi thông báo!")
-      return 0;
-    }
+    // if(!classesCodeOptionSelected || classesCodeOptionSelected?.length === 0) {
+    //   toast.error("Chọn lớp để gửi thông báo!")
+    //   return 0;
+    // }
 
     const config = {
       headers: {
@@ -158,9 +171,10 @@ const CreateNotification = ({
 
 
 
+
     try {
       await axios.post(
-        `http://18.140.66.234/api/v1/notifications?${facultyUrl}${notifyGCUrl}${classCodesUrl}` +
+        `http://18.140.66.234/api/v1/notifications?${facultyUrl}${notifyGCUrl}${classCodesUrl}type=${typeSelected.value}&` +
           new URLSearchParams({
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
             shortDescription,
@@ -175,7 +189,7 @@ const CreateNotification = ({
       setKeyFresh((old) => old + 1);
       toast.success("Thông báo vừa được tạo thành công!");
     } catch (err) {
-      toast.error("Thông báo chưa được tạo!");
+      toast.error(err.response.data.message);
     }
   };
 
@@ -297,7 +311,7 @@ const CreateNotification = ({
 
                 <Select
                   isMulti
-                  defaultValue={facultyOptions}
+                  defaultValue={facultyOptionSelected}
                   onChange={(option) => {
                     setFacultyOptionSelected(option);
                   }}
@@ -316,7 +330,7 @@ const CreateNotification = ({
                 </h3>
                 <Select
                   isMulti
-                  defaultValue={notificationGroupCodeOptions}
+                  defaultValue={notifyCationGroupCodeOptionSelected}
                   onChange={(option) => {
                     setNotifyCationGroupCodeOptionSelected(option);
                   }}
@@ -339,6 +353,26 @@ const CreateNotification = ({
                     setClassesCodeOptionSelected(option);
                   }}
                   options={classesCodeOptions}
+                />
+              </div>
+            </div>
+
+
+            <div className="flex justify-center items-center">
+              <div
+                className={`${
+                  activeInput == "create_noties_5" && "active-input"
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[9px] font-[500] text-[16px]">
+                  Đối tượng truyền thông báo
+                </h3>
+                <Select
+                  defaultValue={typeSelected}
+                  onChange={(option) => {
+                    setTypeSelected(option);
+                  }}
+                  options={SGOptions}
                 />
               </div>
             </div>

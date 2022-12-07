@@ -15,6 +15,10 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import Select from "react-select";
 
+const SGOptions = [
+  {value: "0", label: "Tất Cả"}, {value: "1", label: "Giáo Viên"}, {value: "2", label: "Sinh Viên"},
+]
+
 const UpdateNotification = ({
   updateShow,
   setUpdateShow,
@@ -27,6 +31,7 @@ const UpdateNotification = ({
 
   const [activeInput, setActiveInput] = useState(null);
   const [obj, setObj] = useState({});
+  const [typeSelected, setTypeSelected] = useState([{value: "0", label: "Tất Cả"}])
 
   const [file, setFile] = useState({ name: "Chọn ảnh" });
   const [editorState, setEditorState] = useState(() =>
@@ -34,17 +39,12 @@ const UpdateNotification = ({
   );
 
   const [facultyOptions, setFacultyOptions] = useState([]);
-  const [notificationGroupCodeOptions, setNotificationGroupCodeOptions] =
-    useState([]);
+  const [notificationGroupCodeOptions, setNotificationGroupCodeOptions] =useState([]);
   const [classesCodeOptions, setClassesCodeOptions] = useState([]);
 
-  const [facultyOptionSelected, setFacultyOptionSelected] = useState(null);
-  const [
-    notifyCationGroupCodeOptionSelected,
-    setNotifyCationGroupCodeOptionSelected,
-  ] = useState(null);
-  const [classesCodeOptionSelected, setClassesCodeOptionSelected] =
-    useState(null);
+  const [facultyOptionSelected, setFacultyOptionSelected] = useState([{value: "", label: "Tất Cả"}]);
+  const [notifyCationGroupCodeOptionSelected, setNotifyCationGroupCodeOptionSelected] = useState([]);
+  const [classesCodeOptionSelected, setClassesCodeOptionSelected] = useState([{value: "", label: "Tất Cả"}]);
 
   const getNotificationData = async (notificationId) => {
     const {
@@ -131,6 +131,7 @@ const UpdateNotification = ({
       config
     );
     let optionForClassesCode = [];
+    optionForClassesCode.push({value: "", label: "Tất Cả"})
     data.forEach((item) => {
       optionForClassesCode.push({ value: item.code, label: item.name });
     });
@@ -143,6 +144,8 @@ const UpdateNotification = ({
       "http://18.140.66.234/api/v1/faculties/all?status=true"
     );
     let optionForFaculty = [];
+    optionForFaculty.push({value: "", label: "Tất Cả"})
+
     data.forEach((item) => {
       optionForFaculty.push({ value: item.code, label: item.name });
     });
@@ -166,6 +169,32 @@ const UpdateNotification = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(obj.title.length === 0) {
+      toast.error("Tiêu đề không được để trống!")
+      return 0;
+    }
+    if(obj.shortDescription.length === 0) {
+      toast.error("Mô tả ngắn không được để trống!")
+      return 0;
+    }
+    if(editorState.getCurrentContent().getPlainText().length === 0) {
+      toast.error("Nội dung không được để trống!")
+      return 0;
+    }
+
+    // if(!facultyOptionSelected || facultyOptionSelected?.length === 0) {
+    //   toast.error("Chọn Khoa để gửi thông báo!")
+    //   return 0;
+    // }
+    if(!notifyCationGroupCodeOptionSelected || notifyCationGroupCodeOptionSelected?.length === 0) {
+      toast.error("Chọn nhóm để gửi thông báo!")
+      return 0;
+    }
+    // if(!classesCodeOptionSelected || classesCodeOptionSelected?.length === 0) {
+    //   toast.error("Chọn lớp để gửi thông báo!")
+    //   return 0;
+    // }
+
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -189,7 +218,7 @@ const UpdateNotification = ({
 
     try {
       await axios.put(
-        `http://18.140.66.234/api/v1/notifications?${facultyUrl}${notifyGCUrl}${classCodesUrl}` +
+        `http://18.140.66.234/api/v1/notifications?${facultyUrl}${notifyGCUrl}${classCodesUrl}type=${typeSelected.value ? 0 : typeSelected.value}&` +
           new URLSearchParams({
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
             shortDescription: obj.shortDescription,
@@ -355,7 +384,7 @@ const UpdateNotification = ({
                 </h3>
                 <Select
                   isMulti
-                  defaultValue={notificationGroupCodeOptions}
+                  defaultValue={notifyCationGroupCodeOptionSelected}
                   onChange={(option) => {
                     setNotifyCationGroupCodeOptionSelected(option);
                   }}
@@ -378,6 +407,24 @@ const UpdateNotification = ({
                     setClassesCodeOptionSelected(option);
                   }}
                   options={classesCodeOptions}
+                />
+              </div>
+            </div>
+            <div className="flex justify-center items-center">
+              <div
+                className={`${
+                  activeInput == "create_noties_5" && "active-input"
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[9px] font-[500] text-[16px]">
+                  Đối tượng truyền thông báo
+                </h3>
+                <Select
+                  defaultValue={typeSelected}
+                  onChange={(option) => {
+                    setTypeSelected(option);
+                  }}
+                  options={SGOptions}
                 />
               </div>
             </div>
