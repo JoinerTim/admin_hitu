@@ -25,6 +25,7 @@ const Login = () => {
         const url = "http://18.140.66.234/api/auth/login";
         await fetch(url,{
           headers: {
+            'Access-Control-Allow-Origin': '*',
             'Accept': 'application/json',
             'Content-Type': 'application/json'
             },
