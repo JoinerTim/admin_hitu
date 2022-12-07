@@ -1,0 +1,10 @@
+[[redirects]]
+  from = "./index.html"
+  to = "http://18.140.66.234"
+  status = 200
+  force = true
+  headers = {X-From = "Netlify"}
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
