@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import FacultyAPI from "../../API/FacultyAPI";
 import updateFormImg from "../../assests/updateForm.png";
 import "../scss/main.scss";
+import s from "./../EducationProgram/Form.module.css"
 const FormFaculty = ({ setView, id, code, view, setNewData }) => {
   const [data, setData] = useState({
     id: null,
@@ -124,7 +125,7 @@ const FormFaculty = ({ setView, id, code, view, setNewData }) => {
             <button
               type="button"
               onClick={view === "UPDATE" ? handleUpdate : handleAdd}
-              className="btn-set-css min-w-[180px] my-[20px] rounded-[3px]  h-[50px] p-[10px] font-[900] text-[15px] border-[1px] border-[rgb(216, 65, 48)]"
+              className={s.btnSubmit}
             >
               Xác nhận
             </button>

@@ -1,6 +1,6 @@
 const { default: axiosClient } = require("./axiosClient");
 const FacultyAPI = {
-  getALLFaculty(status) {
+  getALLFaculty(status = true) {
     const url = `v1/faculties/all?status=${status}`;
     return axiosClient.get(url);
   },

@@ -9,19 +9,21 @@ import {
   Notification,
   Student,
   NavbarMain,
-  Faculty
+  Faculty,
 } from "./pages";
+
 import "./App.css";
 
 import { useStateContext } from "./contexts/ContextProvider";
 import ProtectedRoute from "./pages/Services/ProtectedRoute";
-
+import EducationProgram from "./pages/EducationProgram/EducationProgram";
+import EducationProgramSubject from "./pages/EducationProgram/EducationProgramSubject";
 
 const App = () => {
-  const { setCurrentColor, setCurrentMode, currentMode, themeSettings } = useStateContext();
-  
-  const isAuthenticated = localStorage.getItem("accessToken")
+  const { setCurrentColor, setCurrentMode, currentMode, themeSettings } =
+    useStateContext();
 
+  const isAuthenticated = localStorage.getItem("accessToken");
 
   useEffect(() => {
     const currentThemeColor = localStorage.getItem("colorMode");
@@ -30,9 +32,7 @@ const App = () => {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-
   }, []);
- 
 
   return (
     /*
@@ -44,20 +44,82 @@ const App = () => {
           <NavbarMain>
             <div>
               {themeSettings && <ThemeSettings />}
-                <Routes>
-                  {/* dashboard  */}
-                    <Route path="/" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Customers /> </ProtectedRoute>} />
-
-                  {/* pages  */}
-                  <Route path="/Students" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Student /> </ProtectedRoute>} />
-                  <Route path="/Teachers" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Customers /> </ProtectedRoute>} />
-
-                  {/* apps  */}
-                  <Route path="/News" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <News /> </ProtectedRoute>} />
-                  <Route path="/Notification" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Notification /> </ProtectedRoute>} />
-                  <Route path="/faculty" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Faculty /> </ProtectedRoute>} />
-                  <Route path="/login" element={<Login />} />
-                </Routes>
+              <Routes>
+                {/* dashboard  */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      {" "}
+                      <Customers />{" "}
+                    </ProtectedRoute>
+                  }
+                />
+                {/* pages  */}
+                <Route
+                  path="/Students"
+                  element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      {" "}
+                      <Student />{" "}
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/Teachers"
+                  element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      {" "}
+                      <Customers />{" "}
+                    </ProtectedRoute>
+                  }
+                />
+                {/* apps  */}
+                <Route
+                  path="/News"
+                  element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      {" "}
+                      <News />{" "}
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/Notification"
+                  element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      {" "}
+                      <Notification />{" "}
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/faculty"
+                  element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      {" "}
+                      <Faculty />{" "}
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/education-program"
+                  element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      <EducationProgram />{" "}
+                    </ProtectedRoute>
+                  }
+                />{" "}
+                <Route
+                  path="/education-program/:id"
+                  element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                      <EducationProgramSubject />{" "}
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/login" element={<Login />} />
+              </Routes>
             </div>
             <Footer />
           </NavbarMain>
