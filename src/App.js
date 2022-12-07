@@ -1,35 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { Footer, ThemeSettings } from "./components";
 import {
   Login,
-  Ecommerce,
   News,
-  Employees,
-  Stacked,
-  Pyramid,
   Customers,
   Notification,
-  Line,
-  Area,
-  Bar,
-  Pie,
-  Financial,
-  ColorPicker,
-  ColorMapping,
-  Editor,
   Student,
   NavbarMain,
+  Faculty
 } from "./pages";
 import "./App.css";
 
 import { useStateContext } from "./contexts/ContextProvider";
 import ProtectedRoute from "./pages/Services/ProtectedRoute";
 
-function WrapComponent({ children }) {
-  return children;
-}
 
 const App = () => {
   const { setCurrentColor, setCurrentMode, currentMode, themeSettings } = useStateContext();
@@ -69,6 +55,7 @@ const App = () => {
                   {/* apps  */}
                   <Route path="/News" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <News /> </ProtectedRoute>} />
                   <Route path="/Notification" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Notification /> </ProtectedRoute>} />
+                  <Route path="/faculty" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Faculty /> </ProtectedRoute>} />
                   <Route path="/login" element={<Login />} />
                 </Routes>
             </div>

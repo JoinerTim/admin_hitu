@@ -9,7 +9,7 @@ import { RiContactsLine, RiStockLine } from 'react-icons/ri';
 import { MdOutlineSupervisorAccount } from 'react-icons/md';
 import { HiOutlineRefresh } from 'react-icons/hi';
 import { TiTick } from 'react-icons/ti';
-import { GiLouvrePyramid } from 'react-icons/gi';
+import { GiLouvrePyramid, GiMaterialsScience } from 'react-icons/gi';
 import { GrLocation } from 'react-icons/gr';
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';
@@ -511,54 +511,13 @@ export const links = [
         title: 'Thông Báo',
         icon: <BsKanban />,
       },
-      // {
-      //   name: 'editor',
-      //   icon: <FiEdit />,
-      // },
-      // {
-      //   name: 'color-picker',
-      //   icon: <BiColorFill />,
-      // },
+      {
+        name: "faculty",
+        title: "Khoa",
+        icon: <GiMaterialsScience />,
+      }
     ],
   },
-  // {
-  //   title: 'Charts',
-  //   links: [
-  //     {
-  //       name: 'line',
-  //       icon: <AiOutlineStock />,
-  //     },
-  //     {
-  //       name: 'area',
-  //       icon: <AiOutlineAreaChart />,
-  //     },
-
-  //     {
-  //       name: 'bar',
-  //       icon: <AiOutlineBarChart />,
-  //     },
-  //     {
-  //       name: 'pie',
-  //       icon: <FiPieChart />,
-  //     },
-  //     {
-  //       name: 'financial',
-  //       icon: <RiStockLine />,
-  //     },
-  //     {
-  //       name: 'color-mapping',
-  //       icon: <BsBarChart />,
-  //     },
-  //     {
-  //       name: 'pyramid',
-  //       icon: <GiLouvrePyramid />,
-  //     },
-  //     {
-  //       name: 'stacked',
-  //       icon: <AiOutlineBarChart />,
-  //     },
-  //   ],
-  // },
 ];
 
 export const cartData = [

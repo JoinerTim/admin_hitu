@@ -13,10 +13,6 @@ const ProtectedRoute = ({
     return <Navigate to={redirect} />;
   }
 
-  if (adminRoute && isAdmin?.user?.role!=="admin") {
-    return <Navigate to={redirectAdmin} />;
-  }
-
   return children ? children : <Outlet />;
 };
 
