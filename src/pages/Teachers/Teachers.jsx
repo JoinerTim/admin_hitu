@@ -9,13 +9,16 @@ import CreateCustomer from './CreateTeacher';
 import { toast } from "react-toastify";
 import import_excel_svg from "../../assests/import_excel_svg.png"
 import axios from 'axios';
-
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
+import ReactLoading from "react-loading";
 
 const Teachers = () => {
   const dispatch = useDispatch();
 
   const {data: users} = useSelector(state => state.userState)
   const [file, setFile] = useState();
+  const [loading, setLoading] = useState(false);
 
   const [keyFresh, setKeyFresh] = useState(0)
 
@@ -29,7 +32,11 @@ const Teachers = () => {
 
 
   const getData = async () => {
+        setLoading(true);
         await dispatch(getListTeacherPerPage({page: 1, size: 10}));
+        setTimeout(() => {
+          setLoading(false);
+        }, 375)
       }
 
   useEffect(() => {
@@ -147,7 +154,7 @@ const Teachers = () => {
 
   return (
     <div className="col l-10 m-[30px_50px]">
-      {
+      { !loading &&
         // <DataTableExtensions {...tableData} >
         <DataTable
           title="Danh sách giáo viên"
@@ -178,6 +185,25 @@ const Teachers = () => {
       <UpdateCustomer updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
       <CreateCustomer createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
       <ConfirmDelete onClick={() => {handleDeleteUser(rowId)}} deleteShow={deleteShow} setDeleteShow={setDeleteShow} />
+      <Modal
+        showCloseIcon={false}
+        open={loading}
+        onClose={() => {}}
+        center={true}
+        classNames={{
+          overlay: "customOverlayLoading",
+          modal: "customModalLoading",
+        }}
+      >
+        <div className="flex justify-center items-center" style={{ width: "200px", height: "200px" }}>
+          <ReactLoading
+            type={"spinningBubbles"}
+            color={"black"}
+            height={"40%"}
+            width={"40%"}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -3,16 +3,25 @@ import DataTable from "react-data-table-component";
 import FacultyAPI from "../../API/FacultyAPI";
 import { toast } from "react-toastify";
 import FormFaculty from "./FormFaculty";
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
+import ReactLoading from "react-loading";
 
 const Faculty = () => {
+
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [rowId, setRowId] = useState(null);
   const [code, setCode] = useState(null);
   const [view, setView] = useState("");
   const [keyFresh, setKeyFresh] = useState(0)
   useEffect(() => {
+    setLoading(true);
     FacultyAPI.getPageFaculty({ page: 1 })
       .then(({ data }) => {
+        setTimeout(() => {
+          setLoading(false);
+        }, 375)
         setData(data.data);
       })
       .catch((e) => {
@@ -69,6 +78,7 @@ const Faculty = () => {
   ];
   return (
     <div className="rounded-lg shadow-md col l-10 m-[30px_50px]">
+      {!loading && 
       <DataTable
         title="Danh sách khoa"
         columns={columns}
@@ -91,7 +101,7 @@ const Faculty = () => {
           </div>
         }
         dense
-      />
+      />}
       {view && (
         <FormFaculty
           code={code}
@@ -101,6 +111,25 @@ const Faculty = () => {
           setNewData={setData}
         />
       )}
+      <Modal
+        showCloseIcon={false}
+        open={loading}
+        onClose={() => {}}
+        center={true}
+        classNames={{
+          overlay: "customOverlayLoading",
+          modal: "customModalLoading",
+        }}
+      >
+        <div className="flex justify-center items-center" style={{ width: "200px", height: "200px" }}>
+          <ReactLoading
+            type={"spinningBubbles"}
+            color={"black"}
+            height={"40%"}
+            width={"40%"}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

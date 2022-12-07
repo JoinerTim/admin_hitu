@@ -36,9 +36,13 @@
     justify-content: center;
     align-items: center;
 }
-.confirm.show, .delete_confirm.show {
-    display: flex;
-    flex-direction: column;
+.customModalLoading{
+    background-color: transparent !important;
+    box-shadow: unset !important;
+}
+.customOverlayLoading{
+    background: unset !important;
+    // display: none !important;
 }
 
 option{
@@ -50,21 +54,42 @@ option{
 .demo-editor{
     height: 200px;
 }
-.delete_confirm{
-    display: none;
+.delete_confirmed{
     background-color: #fff;
     width: 525px;
     height: 200px;
     margin: 0 auto;
     border-radius: 3px;
     text-align: center;
-    position: fixed;
-    z-index: 1000;
-    opacity: 1;
-    animation: fadeChange 0.3s linear;
-    will-change: opacity, transform;
-    top: 27%;
-    right: 30%
+}
+.customModal{
+    padding: 0 !important;
+    border-radius: 10px;
+    border: 3px solid rgb(243, 108, 19);
+}
+.customModalDelete{
+    padding: 0 !important;
+    border-radius: 10px;
+    border: 1px solid black;
+
+}
+.confirmed{
+    min-width: 790px;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    .closed {
+        position: absolute;
+        right: 3rem;
+        font-size: 22px;
+        top: 0px;
+        right: 10px;
+
+        &:hover {
+            color: tomato;
+            cursor: pointer;
+        }
+
+    }
 }
 
 .confirm {

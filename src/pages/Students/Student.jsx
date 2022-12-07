@@ -7,13 +7,14 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import CreateStudent from "./CreateStudent";
 import UpdateStudent from "./UpdateStudent";
-import import_excel_svg from "../../assests/import_excel_svg.png"
-
+import import_excel_svg from "../../assests/import_excel_svg.png";
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
+import ReactLoading from "react-loading";
 
 const Student = () => {
-  const dispatch = useDispatch();
-
   const [keyFresh, setKeyFresh] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [file, setFile] = useState();
   const [students, setStudents] = useState([]);
 
@@ -33,12 +34,16 @@ const Student = () => {
         )}`,
       },
     };
+    setLoading(true);
     const {
       data: { data },
     } = await axios.get(
       "http://18.140.66.234/api/v1/students/page?page=1&size=30",
       config
     );
+    setTimeout(() => {
+      setLoading(false);
+    }, 375)
     setStudents(data);
   };
 
@@ -47,31 +52,32 @@ const Student = () => {
   }, [keyFresh]);
 
   const handleCreate = async () => {
-    if(!file) {
+    if (!file) {
       setCreateShow(true);
     } else {
       const config = {
         headers: {
           "Content-Type": "multipart/form-data",
-          "Authorization": `Bearer ${JSON.parse(
+          Authorization: `Bearer ${JSON.parse(
             localStorage.getItem("accessToken")
           )}`,
         },
       };
-  
+
       var bodyFormData = new FormData();
       bodyFormData.append("file", file);
       try {
-        await axios.post(`http://18.140.66.234/api/v1/students/upload-excel`,
+        await axios.post(
+          `http://18.140.66.234/api/v1/students/upload-excel`,
           bodyFormData,
           config
         );
 
         setKeyFresh((old) => old + 1);
-        setFile({})
+        setFile({});
         toast.success("Giáo viên được thêm thành công!");
       } catch (err) {
-        setFile({})
+        setFile({});
         toast.error(err.response.data.message);
       }
     }
@@ -158,10 +164,10 @@ const Student = () => {
 
   return (
     <div className="col l-10 m-[30px_50px]">
-      {
+      { !loading && 
         // <DataTableExtensions {...tableData} >
         <DataTable
-          title="Danh sách giáo viên"
+          title="Danh sách sinh viên"
           columns={columns}
           data={students}
           pagination
@@ -221,6 +227,25 @@ const Student = () => {
         deleteShow={deleteShow}
         setDeleteShow={setDeleteShow}
       />
+      <Modal
+        showCloseIcon={false}
+        open={loading}
+        onClose={() => {}}
+        center={true}
+        classNames={{
+          overlay: "customOverlayLoading",
+          modal: "customModalLoading",
+        }}
+      >
+        <div className="flex justify-center items-center" style={{ width: "200px", height: "200px" }}>
+          <ReactLoading
+            type={"spinningBubbles"}
+            color={"black"}
+            height={"40%"}
+            width={"40%"}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

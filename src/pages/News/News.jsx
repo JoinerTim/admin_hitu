@@ -11,11 +11,14 @@ import pencil from "../../assests/pencil.svg";
 import Details from '../Services/Details';
 import ConfirmDelete from '../Services/ConfirmDelete';
 import { EditorState, ContentState, convertFromHTML } from 'draft-js';
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
+import ReactLoading from "react-loading";
 
 
 const News = () =>{
   const [news, setNews] = useState([]);
-  
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const [keyFresh, setKeyFresh] = useState(0);
@@ -30,7 +33,13 @@ const News = () =>{
   const [detailShow, setDetailShow] = useState(false)
 
   const getData = async () => {
+    setLoading(true);
+
     const data = await dispatch(getListNews({page:1, size:10}));
+    setTimeout(() => {
+      setLoading(false);
+    }, 375)
+
     setNews(data.payload);
   }
 
@@ -133,7 +142,7 @@ const columns = [
   )
   return (
     <div className="col l-10 m-[30px_50px]">
-      {
+      { !loading &&
         <DataTable
           title="Danh sách tin tức"
           columns={columns}
@@ -158,6 +167,25 @@ const columns = [
       <CreateNews createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
       <Details getSingleData="http://18.140.66.234/api/v1/news/" rowId={rowId} setRowId={setRowId} detailShow={detailShow} setDetailShow={setDetailShow}/>
       <ConfirmDelete onClick={() => {handleDeleteNews(rowId)}}  deleteShow={deleteShow} setDeleteShow={setDeleteShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <Modal
+        showCloseIcon={false}
+        open={loading}
+        onClose={() => {}}
+        center={true}
+        classNames={{
+          overlay: "customOverlayLoading",
+          modal: "customModalLoading",
+        }}
+      >
+        <div className="flex justify-center items-center" style={{ width: "200px", height: "200px" }}>
+          <ReactLoading
+            type={"spinningBubbles"}
+            color={"black"}
+            height={"40%"}
+            width={"40%"}
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

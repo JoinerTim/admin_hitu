@@ -11,12 +11,14 @@ import Details from '../Services/Details';
 import ConfirmDelete from '../Services/ConfirmDelete';
 import pencil from "../../assests/pencil.svg";
 import { EditorState, ContentState, convertFromHTML } from 'draft-js';
-
+import "react-responsive-modal/styles.css";
+import { Modal } from "react-responsive-modal";
+import ReactLoading from "react-loading";
 
 
 const Notification = () =>{
   const [notification, setNotification] = useState([]);
-  
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const [keyFresh, setKeyFresh] = useState(0);
@@ -31,9 +33,12 @@ const Notification = () =>{
   const [detailShow, setDetailShow] = useState(false)
 
   const [notificationId, setNotificationId] = useState(null)
-
   const getData = async () => {
+    setLoading(true);
     const data = await dispatch(getListNotification({page:1, size:10}));
+    setTimeout(() => {
+      setLoading(false);
+    }, 375)
     setNotification(data.payload);
 }
 
@@ -137,7 +142,7 @@ const columns = [
   )
   return (
     <div className="col l-10 m-[30px_50px]">
-      {
+      {!loading &&
         <DataTable
           title="Danh sách tin tức"
           columns={columns}
@@ -161,6 +166,25 @@ const columns = [
       <CreateNotification createShow={createShow} setCreateShow={setCreateShow}  keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
       <Details getSingleData="http://18.140.66.234/api/v1/notifications/" rowId={rowId} setRowId={setRowId} detailShow={detailShow} setDetailShow={setDetailShow}/>
       <ConfirmDelete onClick={() => {handleDeleteNotification(rowId)}}  deleteShow={deleteShow} setDeleteShow={setDeleteShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <Modal
+        showCloseIcon={false}
+        open={loading}
+        onClose={() => {}}
+        center={true}
+        classNames={{
+          overlay: "customOverlayLoading",
+          modal: "customModalLoading",
+        }}
+      >
+        <div className="flex justify-center items-center" style={{ width: "200px", height: "200px" }}>
+          <ReactLoading
+            type={"spinningBubbles"}
+            color={"black"}
+            height={"40%"}
+            width={"40%"}
+          />
+        </div>
+      </Modal>
     </div>
   );
 }
