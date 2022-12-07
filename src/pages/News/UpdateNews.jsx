@@ -1,9 +1,12 @@
 import React, { useRef, useEffect, useState } from "react";
-import NotificationAPI from "../API/NotificationAPI";
-import "./UpdateNotification.scss";
-import updateFormImg from "../assests/updateForm.png";
+import NewsAPI from "../../API/NewsAPI";
+import "../scss/main.scss";
+
+import updateFormImg from "../../assests/updateForm.png";
 import { toast } from "react-toastify";
 import axios from "axios";
+
+
 import {
   EditorState,
   convertToRaw,
@@ -15,127 +18,37 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import Select from "react-select";
 
-const UpdateNotification = ({
+const UpdateNews = ({
   updateShow,
   setUpdateShow,
-  notificationId,
-  setNotificationId,
+  newsId,
+  setNewsId,
   keyFresh,
   setKeyFresh,
 }) => {
   const confirmRef = useRef();
 
+  // console.log(draftToHtml(convertToRaw(editorState.getCurrentContent())))
+  const [file, setFile] = useState({name: "Chọn ảnh"});
+
   const [activeInput, setActiveInput] = useState(null);
   const [obj, setObj] = useState({});
-
-  const [file, setFile] = useState({ name: "Chọn ảnh" });
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  const [options, setOptions] = useState([]);
+  const [optionSelected, setOptionSelected] = useState(null);
 
-  const [facultyOptions, setFacultyOptions] = useState([]);
-  const [notificationGroupCodeOptions, setNotificationGroupCodeOptions] =
-    useState([]);
-  const [classesCodeOptions, setClassesCodeOptions] = useState([]);
-
-  const [facultyOptionSelected, setFacultyOptionSelected] = useState(null);
-  const [
-    notifyCationGroupCodeOptionSelected,
-    setNotifyCationGroupCodeOptionSelected,
-  ] = useState(null);
-  const [classesCodeOptionSelected, setClassesCodeOptionSelected] =
-    useState(null);
-
-  const getNotificationData = async (notificationId) => {
+  const getNewsData = async (newsId) => {
     const {
-      data: {
-        id,
-        content,
-        createdBy,
-        createdDate,
-        modifiedBy,
-        modifiedDate,
-        shortDescription,
-        slug,
-        status,
-        thumbnail,
-        title,
-        type,
-      },
-    } = await NotificationAPI.getNotificationIdAPI(notificationId);
+      data: { id, content, shortDescription, slug, thumbnail, title },
+    } = await NewsAPI.getPageNewsAPI(newsId);
     setEditorState(
       EditorState.createWithContent(
         ContentState.createFromBlockArray(convertFromHTML(content))
       )
     );
-    setObj({
-      ...obj,
-      id,
-      content,
-      createdBy,
-      createdDate,
-      modifiedBy,
-      modifiedDate,
-      shortDescription,
-      slug,
-      status,
-      thumbnail,
-      title,
-      type,
-    });
-  };
-  useEffect(() => {
-    if (notificationId) {
-      getNotificationData(notificationId);
-    }
-  }, [notificationId]);
-
-  const handleDisplay = () => {
-    if (updateShow) {
-      confirmRef.current.classList.add("show");
-    }
-  };
-  handleDisplay();
-
-  useEffect(() => {
-    getclassesCodeCode();
-    getNotificationGroupCode();
-    getFaculty();
-  }, [keyFresh, updateShow]);
-
-  const getNotificationGroupCode = async () => {
-    const { data } = await axios.get(
-      "http://18.140.66.234/api/v1/notification-groups/all?status=true"
-    );
-    let optionForNotifyCationGC = [];
-    data.forEach((item) => {
-      optionForNotifyCationGC.push({ value: item.code, label: item.name });
-    });
-
-    setNotificationGroupCodeOptions(optionForNotifyCationGC);
-  };
-
-  const getclassesCodeCode = async () => {
-    const config = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${JSON.parse(
-          localStorage.getItem("accessToken")
-        )}`,
-      },
-    };
-    const {
-      data: { data },
-    } = await axios.get(
-      `http://18.140.66.234/api/v1/classes/page?page=1&size=10000`,
-      config
-    );
-    let optionForClassesCode = [];
-    data.forEach((item) => {
-      optionForClassesCode.push({ value: item.code, label: item.name });
-    });
-
-    setClassesCodeOptions(optionForClassesCode);
+    setObj({ ...obj, id, content, shortDescription, slug, thumbnail, title });
   };
 
   const getFaculty = async () => {
@@ -143,71 +56,98 @@ const UpdateNotification = ({
       "http://18.140.66.234/api/v1/faculties/all?status=true"
     );
     let optionForFaculty = [];
+    optionForFaculty.push({value: "", label: "Tất Cả"})
     data.forEach((item) => {
       optionForFaculty.push({ value: item.code, label: item.name });
     });
-    setFacultyOptions(optionForFaculty);
+    setOptions(optionForFaculty);
   };
+
+  useEffect(() => {
+    if (newsId) {
+      getNewsData(newsId);
+    }
+    getFaculty();
+  }, [newsId, updateShow]);
+
+  const handleDisplay = () => {
+    if (updateShow) {
+      confirmRef.current.classList.add("show");
+    }
+  };
+  handleDisplay();
+  useEffect(() => {}, [updateShow]);
 
   const handleClose = () => {
     setActiveInput(null);
-    setNotificationId(null);
+    setNewsId(null);
     confirmRef.current.classList.remove("show");
     setUpdateShow(!updateShow);
   };
 
-  const createUrlQuery = (arr, strUrl) => {
-    let urlQuery = "";
-    arr.map((item, i) => {
-      urlQuery += strUrl + "=" + item.value + "&";
-    });
-    return urlQuery;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(obj.title==="") {
+      toast.error("Tiêu đề không được để trống!")
+      return 0;
+    }
+    if(obj.title.length >= 150) {
+      toast.error("Tiêu đề không được lớn hơn 150 kí tự!")
+      return 0;
+    }
+    if(obj.shortDescription ==="") {
+      toast.error("Mô tả ngắn không được để trống!")
+      return 0;
+    }
+    if(obj.shortDescription.length >= 255) {
+      toast.error("Mô tả ngắn không được lớn hơn 255 kí tự!")
+      return 0;
+    }
+    if(editorState.getCurrentContent().getPlainText().length === 0) {
+      toast.error("Nội dung không được để trống!")
+      return 0;
+    }
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Authorization": `Bearer ${JSON.parse(
-          localStorage.getItem("accessToken")
-        )}`,
+        "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`
       },
     };
-    var bodyFormData = new FormData();
-    bodyFormData.append("file", file);
 
-    const facultyUrl = createUrlQuery(facultyOptionSelected, "facultyCodes");
-    const notifyGCUrl = createUrlQuery(
-      notifyCationGroupCodeOptionSelected,
-      "notificationGroupCode"
-    );
-    const classCodesUrl = createUrlQuery(
-      classesCodeOptionSelected,
-      "classCodes"
-    );
+    var bodyFormData = new FormData();
+    bodyFormData.append('file', file); 
+
+    const facultyCodes = () => {
+      if(optionSelected?.length > 0 ){
+        let stringFaculty = "";
+        optionSelected.map((item, i) => {
+          stringFaculty += "facultyCodes" + "=" + item.value + "&";
+        });
+        return stringFaculty;
+      }
+      return ""
+    };
+    const facultyUrl = facultyCodes();
 
     try {
-      await axios.put(
-        `http://18.140.66.234/api/v1/notifications?${facultyUrl}${notifyGCUrl}${classCodesUrl}` +
-          new URLSearchParams({
-            content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
-            shortDescription: obj.shortDescription,
-            title: obj.title,
-            id: obj.id
-          }),
-        bodyFormData,
-        config
-      );
+      await axios.put(`http://18.140.66.234/api/v1/news?${facultyUrl}` + new URLSearchParams({
+          content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
+          id: obj.id,
+          shortDescription: obj.shortDescription,
+          title: obj.title,
+      }), bodyFormData, config)
 
-
-      handleClose();
-      setKeyFresh((old) => old + 1);
-      toast.success("Thông báo vừa được cập nhật thành công!");
+        setObj("");
+        handleClose();
+        setKeyFresh((old) => old + 1);
+        toast.success("Tin tức vừa được cập nhật thành công!");
     } catch (err) {
-      toast.error("Thông báo chưa được cập nhật!");
+      toast.error("Tin tức chưa được cập nhật")
+      console.log(err)
     }
   };
+
+ 
 
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -238,7 +178,7 @@ const UpdateNotification = ({
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "update_noties_1" && "active-input"
+                  activeInput == "update_news_1" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Tiêu Đề</h3>
@@ -246,7 +186,7 @@ const UpdateNotification = ({
                   name="title"
                   value={obj.title}
                   onChange={(e) => {
-                    setObj((obj) => {
+                    setObj((old) => {
                       const newobj = { ...obj, title: e.target.value };
                       return newobj;
                     });
@@ -259,12 +199,12 @@ const UpdateNotification = ({
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="update_noties_1"
+                  id="update_news_1"
                 />
               </div>
               <div
                 className={`${
-                  activeInput == "update_noties_2" && "active-input"
+                  activeInput == "update_news_2" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Mô Tả Ngắn</h3>
@@ -275,7 +215,7 @@ const UpdateNotification = ({
                   }}
                   value={obj.shortDescription}
                   onChange={(e) => {
-                    setObj((obj) => {
+                    setObj((old) => {
                       const newobj = {
                         ...obj,
                         shortDescription: e.target.value,
@@ -288,24 +228,24 @@ const UpdateNotification = ({
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="update_noties_2"
+                  id="update_news_2"
                 />
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div
                 className={`${
-                  activeInput == "update_noties_3" && "active-input"
+                  activeInput == "update_news_3" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <label
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mb-[12px] font-[500] text-[16px]"
-                  htmlFor="update_noties_3"
+                  htmlFor="file_inputCreate"
                 >
                   Tải ảnh
                 </label>
                 <label
-                  htmlFor="update_noties_3"
+                  htmlFor="file_inputCreate"
                   className="w-[348px] flex items-center justify-center h-[40px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                 >
                   <input
@@ -319,7 +259,7 @@ const UpdateNotification = ({
                       setActiveInput(null);
                     }}
                     className="hidden "
-                    id="update_noties_3"
+                    id="file_inputCreate"
                     type="file"
                   />
                   {file?.name !== "Chọn ảnh" ? "1 Đã Chọn" : file.name}
@@ -327,7 +267,7 @@ const UpdateNotification = ({
               </div>
               <div
                 className={`${
-                  activeInput == "update_noties_4" && "active-input"
+                  activeInput == "update_news_4" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -336,55 +276,18 @@ const UpdateNotification = ({
 
                 <Select
                   isMulti
-                  defaultValue={facultyOptionSelected}
+                  defaultValue={{ label: "Tất cả", value: "" }}
                   onChange={(option) => {
-                    setFacultyOptionSelected(option);
+                    setOptionSelected(option);
                   }}
-                  options={facultyOptions}
-                />
-              </div>
-            </div>
-            <div className="flex justify-center items-center">
-              <div
-                className={`${
-                  activeInput == "update_noties_4" && "active-input"
-                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
-              >
-                <h3 className="mb-[9px] font-[500] text-[16px]">
-                  Mã nhóm truyền thông báo
-                </h3>
-                <Select
-                  isMulti
-                  defaultValue={notificationGroupCodeOptions}
-                  onChange={(option) => {
-                    setNotifyCationGroupCodeOptionSelected(option);
-                  }}
-                  options={notificationGroupCodeOptions}
-                />
-              </div>
-              <div
-                className={`${
-                  activeInput == "update_noties_5" && "active-input"
-                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
-              >
-                <h3 className="mb-[9px] font-[500] text-[16px]">
-                  Lớp truyền thông báo
-                </h3>
-
-                <Select
-                  isMulti
-                  defaultValue={classesCodeOptionSelected}
-                  onChange={(option) => {
-                    setClassesCodeOptionSelected(option);
-                  }}
-                  options={classesCodeOptions}
+                  options={options}
                 />
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "update_noties_6" && "active-input"
+                  activeInput == "update_news_5" && "active-input"
                 } rounded-[3px] w-[730px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Nội Dung</h3>
@@ -395,10 +298,16 @@ const UpdateNotification = ({
                   onEditorStateChange={(state) => {
                     setEditorState(state);
                   }}
+                  // toolbar={{
+                  //   image: {
+                  //     uploadEnabled: true,
+                  //     uploadCallback: uploadImageCallBack,
+                  //   },
+                  // }}
                 />
                 <label
                   className="font-[400] text-[11px]"
-                  htmlFor="update_noties_6"
+                  htmlFor="update_news_5"
                 ></label>
               </div>
             </div>
@@ -418,4 +327,4 @@ const UpdateNotification = ({
   );
 };
 
-export default UpdateNotification;
+export default UpdateNews;

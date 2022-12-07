@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
-import "./CreateNews.scss";
-import updateFormImg from "../assests/updateForm.png";
+import "../scss/main.scss";
+import updateFormImg from "../../assests/updateForm.png";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { EditorState, convertToRaw } from "draft-js";
@@ -9,18 +9,32 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import Select from "react-select";
 
-const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
+const CreateNotification = ({
+  createShow,
+  setCreateShow,
+  keyFresh,
+  setKeyFresh,
+}) => {
   const confirmRef = useRef();
-  const [file, setFile] = useState({ name: "Chọn ảnh" });
-  const [activeInput, setActiveInput] = useState(null);
-  const [obj, setObj] = useState({title: "", content: "", shortDescription: ""});
 
+  const [title, setTitle] = useState("");
+  const [shortDescription, setShortDescription] = useState("");
+  const [activeInput, setActiveInput] = useState(null);
+  const [file, setFile] = useState({ name: "Chọn ảnh" });
   const [editorState, setEditorState] = useState(() =>
   EditorState.createEmpty()
   );
 
-  const [options, setOptions] = useState([]);
-  const [optionSelected, setOptionSelected] = useState([]);
+  const [facultyOptions, setFacultyOptions] = useState([]);
+  const [notificationGroupCodeOptions, setNotificationGroupCodeOptions] = useState([]);
+  const [classesCodeOptions, setClassesCodeOptions] = useState([]);
+
+
+  const [facultyOptionSelected, setFacultyOptionSelected] = useState(null);
+  const [notifyCationGroupCodeOptionSelected, setNotifyCationGroupCodeOptionSelected] = useState(null);
+  const [classesCodeOptionSelected, setClassesCodeOptionSelected] = useState(null);
+
+
 
   const handleDisplay = () => {
     if (createShow) {
@@ -29,40 +43,79 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
   };
   handleDisplay();
 
+  const getNotificationGroupCode = async () => {
+    const { data } = await axios.get(
+      "http://18.140.66.234/api/v1/notification-groups/all?status=true"
+    );
+    let optionForNotifyCationGC = [];
+    data.forEach((item) => {
+      optionForNotifyCationGC.push({ value: item.code, label: item.name });
+    });
+
+    setNotificationGroupCodeOptions(optionForNotifyCationGC)
+  };
+
+  const getclassesCodeCode = async () => {
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Authorization": `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+      },
+    };
+    const { data: {data} } = await axios.get(
+      `http://18.140.66.234/api/v1/classes/page?page=1&size=10000`, config
+    );
+    let optionForClassesCode = [];
+    data.forEach((item) => {
+      optionForClassesCode.push({ value: item.code, label: item.name });
+    });
+
+    setClassesCodeOptions(optionForClassesCode)
+  };
+
   const getFaculty = async () => {
     const { data } = await axios.get(
       "http://18.140.66.234/api/v1/faculties/all?status=true"
     );
     let optionForFaculty = [];
-    optionForFaculty.push({value: "", label: "Tất Cả"})
     data.forEach((item) => {
       optionForFaculty.push({ value: item.code, label: item.name });
     });
-    setOptions(optionForFaculty);
+    setFacultyOptions(optionForFaculty);
   };
-  
-  useEffect(() => {
-    getFaculty();
-  }, [createShow]);
 
+
+
+  useEffect(() => {
+    getclassesCodeCode()
+    getNotificationGroupCode();
+    getFaculty();
+  }, [keyFresh, createShow]);
 
   const handleClose = () => {
+    setTitle("");
+    setShortDescription("");
     setActiveInput(null);
-    confirmRef.current.classList.remove("show");
     setCreateShow(!createShow);
+    confirmRef.current.classList.remove("show");
+  };
+
+  const createUrlQuery = (arr, strUrl) => {
+    let urlQuery = "";
+    arr.map((item, i) => {
+      urlQuery += strUrl + "=" + item.value + "&";
+    });
+    return urlQuery;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(obj.title==="") {
+
+    if(title.length === 0) {
       toast.error("Tiêu đề không được để trống!")
       return 0;
     }
-    if(obj.title.length >= 150) {
-      toast.error("Tiêu đề không được lớn hơn 150 kí tự!")
-      return 0;
-    }
-    if(obj.shortDescription ==="") {
+    if(shortDescription.length === 0) {
       toast.error("Mô tả ngắn không được để trống!")
       return 0;
     }
@@ -70,56 +123,59 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
       toast.error("Vui lòng chọn ảnh!")
       return 0;
     }
-    if(obj.shortDescription.length >= 255) {
-      toast.error("Mô tả ngắn không được lớn hơn 255 kí tự!")
-      return 0;
-    }
     if(editorState.getCurrentContent().getPlainText().length === 0) {
       toast.error("Nội dung không được để trống!")
       return 0;
     }
+
+    if(!facultyOptionSelected || facultyOptionSelected?.length === 0) {
+      toast.error("Chọn Khoa để gửi thông báo!")
+      return 0;
+    }
+    if(!notifyCationGroupCodeOptionSelected) {
+      toast.error("Chọn nhóm để gửi thông báo!")
+      return 0;
+    }
+    if(!classesCodeOptionSelected) {
+      toast.error("Chọn lớp để gửi thông báo!")
+      return 0;
+    }
+
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Authorization": `Bearer ${JSON.parse(
+        Authorization: `Bearer ${JSON.parse(
           localStorage.getItem("accessToken")
         )}`,
       },
     };
-
     var bodyFormData = new FormData();
     bodyFormData.append("file", file);
 
-    const facultyCodes = () => {
-      if(optionSelected?.length > 0 ){
-        let stringFaculty = "";
-        optionSelected.map((item, i) => {
-          stringFaculty += "facultyCodes" + "=" + item.value + "&";
-        });
-        return stringFaculty;
-      }
-      return ""
-    };
-    const facultyUrl = facultyCodes();
+    const facultyUrl = createUrlQuery(facultyOptionSelected, "facultyCodes");
+    const notifyGCUrl = createUrlQuery(notifyCationGroupCodeOptionSelected, "notificationGroupCode");
+    const classCodesUrl = createUrlQuery(classesCodeOptionSelected, "classCodes");
+
+
 
     try {
       await axios.post(
-        `http://18.140.66.234/api/v1/news?${facultyUrl}` +
+        `http://18.140.66.234/api/v1/notifications?${facultyUrl}${notifyGCUrl}${classCodesUrl}` +
           new URLSearchParams({
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
-            shortDescription: obj.shortDescription,
-            title: obj.title,
+            shortDescription,
+            title,
+          
           }),
         bodyFormData,
         config
       );
 
-      setObj("");
-      setKeyFresh((old) => old + 1);
       handleClose();
-      toast.success("Tin Tức Vừa Được Tạo Thành Công!");
+      setKeyFresh((old) => old + 1);
+      toast.success("Thông báo vừa được tạo thành công!");
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error("Thông báo chưa được tạo!");
     }
   };
 
@@ -144,7 +200,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                 height="135px"
                 alt="imgForm"
               />
-              <h1 className="text-[20px] font-[600]">Tạo Tin tức</h1>
+              <h1 className="text-[20px] font-[600]">Tạo Thông Báo</h1>
             </div>
           </div>
           <div className="border-b-[1px] border-black"></div>
@@ -152,18 +208,15 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "create_news_1" && "active-input"
+                  activeInput == "create_noties_1" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Tiêu Đề</h3>
                 <input
                   name="title"
-                  value={obj.title}
+                  value={title}
                   onChange={(e) => {
-                    setObj((old) => {
-                      const newobj = { ...obj, title: e.target.value };
-                      return newobj;
-                    });
+                    setTitle(e.target.value);
                   }}
                   onFocus={(e) => {
                     setActiveInput(e.target.id);
@@ -173,12 +226,12 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="create_news_1"
+                  id="create_noties_1"
                 />
               </div>
               <div
                 className={`${
-                  activeInput == "create_news_2" && "active-input"
+                  activeInput == "create_noties_2" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Mô Tả Ngắn</h3>
@@ -187,39 +240,33 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                   onFocus={(e) => {
                     setActiveInput(e.target.id);
                   }}
-                  value={obj.shortDescription}
+                  value={shortDescription}
                   onChange={(e) => {
-                    setObj((old) => {
-                      const newobj = {
-                        ...obj,
-                        shortDescription: e.target.value,
-                      };
-                      return newobj;
-                    });
+                    setShortDescription(e.target.value);
                   }}
                   onBlur={(e) => {
                     setActiveInput(null);
                   }}
                   className="mb-[12px] px-[12px] w-[348px] h-[40px] input-hover font-[14px] rounded-[4px] border-[1px] border-solid border-[rgba(0,0,0,0.4)]"
                   type="text"
-                  id="create_news_2"
+                  id="create_noties_2"
                 />
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div
                 className={`${
-                  activeInput == "create_news_3" && "active-input"
+                  activeInput == "create_noties_3" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <label
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white mb-[12px] font-[500] text-[16px]"
-                  htmlFor="file_inputCreateNew"
+                  htmlFor="file_inputCreateNoti"
                 >
                   Tải ảnh
                 </label>
                 <label
-                  htmlFor="file_inputCreateNew"
+                  htmlFor="file_inputCreateNoti"
                   className="w-[348px] flex items-center justify-center h-[40px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                 >
                   <input
@@ -233,7 +280,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                       setActiveInput(null);
                     }}
                     className="hidden "
-                    id="file_inputCreateNew"
+                    id="file_inputCreateNoti"
                     type="file"
                   />
                   {file?.name !== "Chọn ảnh" ? "1 Đã Chọn" : file.name}
@@ -241,7 +288,7 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
               </div>
               <div
                 className={`${
-                  activeInput == "create_news_4" && "active-input"
+                  activeInput == "create_noties_4" && "active-input"
                 } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[9px] font-[500] text-[16px]">
@@ -250,18 +297,55 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
 
                 <Select
                   isMulti
-                  defaultValue={{ label: "Tất cả", value: "" }}
+                  defaultValue={facultyOptions}
                   onChange={(option) => {
-                    setOptionSelected(option);
+                    setFacultyOptionSelected(option);
                   }}
-                  options={options}
+                  options={facultyOptions}
+                />
+              </div>
+            </div>
+            <div className="flex justify-center items-center">
+              <div
+                className={`${
+                  activeInput == "create_noties_5" && "active-input"
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[9px] font-[500] text-[16px]">
+                  Mã nhóm truyền thông báo
+                </h3>
+                <Select
+                  isMulti
+                  defaultValue={notificationGroupCodeOptions}
+                  onChange={(option) => {
+                    setNotifyCationGroupCodeOptionSelected(option);
+                  }}
+                  options={notificationGroupCodeOptions}
+                />
+              </div>
+              <div
+                className={`${
+                  activeInput == "create_noties_6" && "active-input"
+                } rounded-[3px] w-[369px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
+              >
+                <h3 className="mb-[9px] font-[500] text-[16px]">
+                  Lớp truyền thông báo
+                </h3>
+
+                <Select
+                  isMulti
+                  defaultValue={classesCodeOptionSelected}
+                  onChange={(option) => {
+                    setClassesCodeOptionSelected(option);
+                  }}
+                  options={classesCodeOptions}
                 />
               </div>
             </div>
             <div className="flex justify-center items-center">
               <div
                 className={` ${
-                  activeInput == "create_news_5" && "active-input"
+                  activeInput == "create_noties_7" && "active-input"
                 } rounded-[3px] w-[730px] px-[10px] py-[12px] mt-[28px] flex flex-col justify-center items-start`}
               >
                 <h3 className="mb-[12px] font-[500] text-[16px]">Nội Dung</h3>
@@ -275,10 +359,11 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
                 />
                 <label
                   className="font-[400] text-[11px]"
-                  htmlFor="create_news_5"
+                  htmlFor="create_noties_7"
                 ></label>
               </div>
             </div>
+            
           </div>
           <div className="border-b-[1px] border-black"></div>
           <div className="flex justify-center items-center text-center">
@@ -295,4 +380,4 @@ const CreateNews = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
   );
 };
 
-export default CreateNews;
+export default CreateNotification;

@@ -1,21 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import DataTable from "react-data-table-component";
-import "./Customers.scss";
-import {getListTeacherPerPage} from '../redux/toolskit/userSlice'
-import UpdateCustomer from './UpdateCustomer';
-import ConfirmDelete from './ConfirmDelete';
-import CreateCustomer from './CreateCustomer';
+import "../scss/main.scss";
+import ConfirmDelete from '../Services/ConfirmDelete';
 import { toast } from "react-toastify";
+import axios from 'axios';
+import CreateStudent from './CreateStudent';
+import UpdateStudent from './UpdateStudent';
 
 
-const DashboardUsers = () => {
+const Student = () => {
   const dispatch = useDispatch();
 
-  const {data: users} = useSelector(state => state.userState)
-
-
   const [keyFresh, setKeyFresh] = useState(0)
+
+  const [students, setStudents] = useState([])
 
   const [updateShow, setUpdateShow] = useState(false)
   const [createShow, setCreateShow] = useState(false)
@@ -27,8 +26,14 @@ const DashboardUsers = () => {
 
 
   const getData = async () => {
-        await dispatch(getListTeacherPerPage({page: 1, size: 10}));
-      }
+    const config = {
+        headers: {
+          "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`
+        },
+      };
+        const {data: {data}} = await axios.get("http://18.140.66.234/api/v1/students/page?page=1&size=30", config)
+        setStudents(data)
+    }
 
   useEffect(() => {
     getData();
@@ -40,11 +45,11 @@ const DashboardUsers = () => {
 
   const handleDeleteUser = async (id) => {
     try {
-      await fetch(`http://18.140.66.234/api/v1/teachers/toggle-status?ids=${id}`, {method: "PUT"})
+      await fetch(`http://18.140.66.234/api/v1/students/toggle-status?ids=${id}`, {method: "PUT"})
       setKeyFresh(old => old + 1)
-      toast.success("Người dùng vừa được xóa thành công");
+      toast.success("Sinh viên vừa được xóa thành công");
     } catch (error) {
-      toast.error("Người dùng chưa được xóa!");
+      toast.error("Sinh viên chưa được xóa!");
     }
   };
 
@@ -66,8 +71,8 @@ const DashboardUsers = () => {
     },
     {
       sortable: true,
-      name: "Khoa",
-      selector: (row) => row.facultyName,
+      name: "Lớp",
+      selector: (row) => row.className,
     },
     {
       name: "Email",
@@ -115,7 +120,7 @@ const DashboardUsers = () => {
         <DataTable
           title="Danh sách giáo viên"
           columns={columns}
-          data={users}
+          data={students}
           pagination
           fixedHeader
           fixedHeaderScrollHeight="400px"
@@ -133,12 +138,12 @@ const DashboardUsers = () => {
         />
         // </DataTableExtensions>
       }
-      <UpdateCustomer updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
-      <CreateCustomer createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <UpdateStudent updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <CreateStudent createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
       <ConfirmDelete onClick={() => {handleDeleteUser(rowId)}} deleteShow={deleteShow} setDeleteShow={setDeleteShow} />
     </div>
   );
 };
 
 
-export default DashboardUsers;
+export default Student;

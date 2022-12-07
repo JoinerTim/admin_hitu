@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { Footer, ThemeSettings } from "./components";
@@ -25,14 +25,17 @@ import {
 import "./App.css";
 
 import { useStateContext } from "./contexts/ContextProvider";
+import ProtectedRoute from "./pages/Services/ProtectedRoute";
+
+function WrapComponent({ children }) {
+  return children;
+}
 
 const App = () => {
-  const { setCurrentColor, setCurrentMode, currentMode, themeSettings } =
-    useStateContext();
+  const { setCurrentColor, setCurrentMode, currentMode, themeSettings } = useStateContext();
+  
+  const isAuthenticated = localStorage.getItem("accessToken")
 
-    const userID = localStorage.getItem("accessToken")
-    ? localStorage.getItem("accessToken")
-    : null;
 
   useEffect(() => {
     const currentThemeColor = localStorage.getItem("colorMode");
@@ -41,7 +44,8 @@ const App = () => {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-  }, [userID]);
+
+  }, []);
  
 
   return (
@@ -56,19 +60,16 @@ const App = () => {
               {themeSettings && <ThemeSettings />}
                 <Routes>
                   {/* dashboard  */}
-                  <Route path="/" element={<Customers />} />
-                  <Route path="/Home" element={<Ecommerce />} />
+                    <Route path="/" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Customers /> </ProtectedRoute>} />
 
                   {/* pages  */}
-                  <Route path="/Students" element={<Student />} />
-                  <Route path="/Teachers" element={<Customers />} />
+                  <Route path="/Students" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Student /> </ProtectedRoute>} />
+                  <Route path="/Teachers" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Customers /> </ProtectedRoute>} />
 
                   {/* apps  */}
-                  <Route path="/News" element={<News />} />
-                  <Route path="/Notification" element={<Notification />} />
+                  <Route path="/News" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <News /> </ProtectedRoute>} />
+                  <Route path="/Notification" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Notification /> </ProtectedRoute>} />
                   <Route path="/login" element={<Login />} />
-                  
-
                 </Routes>
             </div>
             <Footer />

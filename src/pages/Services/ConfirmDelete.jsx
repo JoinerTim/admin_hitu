@@ -1,5 +1,5 @@
 import React, {useRef} from 'react'
-import "./UpdateCustomer.scss"
+import "../scss/main.scss"
 
 const ConfirmDelete = ({deleteShow, setDeleteShow, onClick}) => {
   const confirmRef = useRef(null)

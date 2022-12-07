@@ -1,12 +1,12 @@
 import React, { useRef, useEffect, useState } from "react";
-import TeacherAPI from "../API/TeacherAPI";
-import "./UpdateCustomer.scss";
-import updateFormImg from "../assests/updateForm.png";
+import TeacherAPI from "../../API/TeacherAPI";
+import "../scss/main.scss";
+import updateFormImg from "../../assests/updateForm.png";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 
-const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh, setKeyFresh }) => {
+const UpdateTeacher = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh, setKeyFresh }) => {
   const confirmRef = useRef();
 
   const [activeInput, setActiveInput] = useState(null);
@@ -382,4 +382,4 @@ const UpdateCustomer = ({ updateShow, setUpdateShow, userId, setUserId, keyFresh
   );
 };
 
-export default UpdateCustomer;
+export default UpdateTeacher;

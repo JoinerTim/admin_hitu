@@ -3,13 +3,13 @@ import {useDispatch} from 'react-redux';
 import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 
-import { getListNews } from '../redux/toolskit/newsSlice'
+import { getListNews } from '../../redux/toolskit/newsSlice'
 import UpdateNews from './UpdateNews';
 import CreateNews from './CreateNews';
 import axios from 'axios';
-import pencil from ".././assests/pencil.svg";
-import Details from './Details';
-import ConfirmDelete from './ConfirmDelete';
+import pencil from "../../assests/pencil.svg";
+import Details from '../Services/Details';
+import ConfirmDelete from '../Services/ConfirmDelete';
 import { EditorState, ContentState, convertFromHTML } from 'draft-js';
 
 

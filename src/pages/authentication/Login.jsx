@@ -39,6 +39,7 @@ const Login = () => {
         }).then((data) => {
             localStorage.setItem("accessToken",JSON.stringify(data.accessToken) );
             history("/Teachers")
+            window.location.reload();
         })
         
       };

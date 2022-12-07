@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, {useEffect, useRef, useState} from 'react'
-import "./UpdateCustomer.scss"
+import "../scss/main.scss"
 import { Markup } from 'interweave';
 
 const Details = ({detailShow, setDetailShow, rowId, setRowId, getSingleData}) => {

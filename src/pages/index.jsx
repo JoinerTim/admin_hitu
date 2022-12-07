@@ -1,16 +1,16 @@
 export { default as Ecommerce } from './Ecommerce';
-export { default as Notification } from './Notification';
+export { default as Notification } from './Notifications/Notification';
 // export { default as Orders } from './Orders';
 export { default as Employees } from './Employees';
 export { default as NavbarMain } from './NavbarMain';
 
-export { default as Login } from './Login';
+export { default as Login } from './authentication/Login';
 export { default as Editor } from './Editor';
-export { default as Customers } from './Customers';
-export { default as Student } from './Student';
+export { default as Customers } from './Teachers/Teachers';
+export { default as Student } from './Students/Student';
 
 export { default as ColorPicker } from './ColorPicker';
-export { default as News } from './News';
+export { default as News } from './News/News';
 export { default as Area } from './Charts/Area';
 export { default as Bar } from './Charts/Bar';
 export { default as ColorMapping } from './Charts/ColorMapping';

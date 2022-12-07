@@ -1,13 +1,71 @@
+
 .update-customer {
     display: flex;
     justify-content: center;
 }
 
-.confirm.show {
+.sc-hLBbgP{
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.rdt_TableCell{
+    font-weight: 400;
+    text-transform: unset;
+
+}
+
+.btn-action{
+    width: 33px;
+    height: 29px;
+    border-radius: 8px;
+    left: 18px;
+    font-weight: 800;
+    font-size: 12px;
+}
+.update-handle{
+    background-color: green;
+    margin: 6px 4px;
+}
+
+.delete-handle{
+    background-color: red;
+    color: white;
+}
+.action--item{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.confirm.show, .delete_confirm.show {
     display: flex;
     flex-direction: column;
 }
 
+option{
+    height: 100px;
+}
+.demo-editor, .rdw-editor-toolbar{
+    border: 1px solid rgba(0,0,0,0.3);
+}
+.demo-editor{
+    height: 200px;
+}
+.delete_confirm{
+    display: none;
+    background-color: #fff;
+    width: 525px;
+    height: 200px;
+    margin: 0 auto;
+    border-radius: 3px;
+    text-align: center;
+    position: fixed;
+    z-index: 1000;
+    opacity: 1;
+    animation: fadeChange 0.3s linear;
+    will-change: opacity, transform;
+    top: 27%;
+    right: 30%
+}
 
 .confirm {
     display: none;
@@ -90,9 +148,4 @@
         opacity: 0.7;
         transform: translateY(0px);
     }
-}
-
-.ovrly,
-.confirm {
-    // display: none;
 }

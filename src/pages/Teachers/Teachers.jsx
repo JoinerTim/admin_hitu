@@ -1,20 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import DataTable from "react-data-table-component";
-import "./Customers.scss";
-import ConfirmDelete from './ConfirmDelete';
+import "../scss/main.scss";
+import {getListTeacherPerPage} from '../../redux/toolskit/userSlice'
+import UpdateCustomer from './UpdateTeacher';
+import ConfirmDelete from '../Services/ConfirmDelete';
+import CreateCustomer from './CreateTeacher';
 import { toast } from "react-toastify";
-import axios from 'axios';
-import CreateStudent from './CreateStudent';
-import UpdateStudent from './UpdateStudent';
 
 
-const Student = () => {
+const Teachers = () => {
   const dispatch = useDispatch();
 
-  const [keyFresh, setKeyFresh] = useState(0)
+  const {data: users} = useSelector(state => state.userState)
 
-  const [students, setStudents] = useState([])
+
+  const [keyFresh, setKeyFresh] = useState(0)
 
   const [updateShow, setUpdateShow] = useState(false)
   const [createShow, setCreateShow] = useState(false)
@@ -26,14 +27,8 @@ const Student = () => {
 
 
   const getData = async () => {
-    const config = {
-        headers: {
-          "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`
-        },
-      };
-        const {data: {data}} = await axios.get("http://18.140.66.234/api/v1/students/page?page=1&size=30", config)
-        setStudents(data)
-    }
+        await dispatch(getListTeacherPerPage({page: 1, size: 10}));
+      }
 
   useEffect(() => {
     getData();
@@ -45,11 +40,11 @@ const Student = () => {
 
   const handleDeleteUser = async (id) => {
     try {
-      await fetch(`http://18.140.66.234/api/v1/students/toggle-status?ids=${id}`, {method: "PUT"})
+      await fetch(`http://18.140.66.234/api/v1/teachers/toggle-status?ids=${id}`, {method: "PUT"})
       setKeyFresh(old => old + 1)
-      toast.success("Sinh viên vừa được xóa thành công");
+      toast.success("Người dùng vừa được xóa thành công");
     } catch (error) {
-      toast.error("Sinh viên chưa được xóa!");
+      toast.error("Người dùng chưa được xóa!");
     }
   };
 
@@ -71,8 +66,8 @@ const Student = () => {
     },
     {
       sortable: true,
-      name: "Lớp",
-      selector: (row) => row.className,
+      name: "Khoa",
+      selector: (row) => row.facultyName,
     },
     {
       name: "Email",
@@ -120,7 +115,7 @@ const Student = () => {
         <DataTable
           title="Danh sách giáo viên"
           columns={columns}
-          data={students}
+          data={users}
           pagination
           fixedHeader
           fixedHeaderScrollHeight="400px"
@@ -138,12 +133,12 @@ const Student = () => {
         />
         // </DataTableExtensions>
       }
-      <UpdateStudent updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
-      <CreateStudent createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <UpdateCustomer updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
+      <CreateCustomer createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
       <ConfirmDelete onClick={() => {handleDeleteUser(rowId)}} deleteShow={deleteShow} setDeleteShow={setDeleteShow} />
     </div>
   );
 };
 
 
-export default Student;
+export default Teachers;

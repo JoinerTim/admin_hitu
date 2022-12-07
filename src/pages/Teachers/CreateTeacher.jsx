@@ -1,12 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
-import TeacherAPI from "../API/TeacherAPI";
-import "./UpdateCustomer.scss";
-import updateFormImg from "../assests/updateForm.png";
+import "../scss/main.scss";
+import updateFormImg from "../../assests/updateForm.png";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import uuid from 'react-uuid';
 import axios from "axios";
-const CreateCustomer = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
+const CreateTeacher = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) => {
     const confirmRef = useRef();
 
     const [faculty,setFaculty] = useState([]);
@@ -322,4 +321,4 @@ const CreateCustomer = ({ createShow, setCreateShow, keyFresh, setKeyFresh }) =>
   )
 }
 
-export default CreateCustomer
+export default CreateTeacher

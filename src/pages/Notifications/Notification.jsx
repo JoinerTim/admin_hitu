@@ -4,12 +4,12 @@ import { toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import axios from 'axios';
 
-import { getListNotification } from '../redux/toolskit/notificationSlice.js'
+import { getListNotification } from '../../redux/toolskit/notificationSlice.js'
 import UpdateNotification from './UpdateNotification';
 import CreateNotification from './CreateNoti';
-import Details from './Details';
-import ConfirmDelete from './ConfirmDelete';
-import pencil from ".././assests/pencil.svg";
+import Details from '../Services/Details';
+import ConfirmDelete from '../Services/ConfirmDelete';
+import pencil from "../../assests/pencil.svg";
 import { EditorState, ContentState, convertFromHTML } from 'draft-js';
 
 
