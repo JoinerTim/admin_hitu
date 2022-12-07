@@ -26,6 +26,7 @@ const Login = () => {
         await fetch(url,{
           headers: {
             'Access-Control-Allow-Origin': '*',
+            "Access-Control-Allow-Origin":"http://18.140.66.234/",
             'Accept': 'application/json',
             'Content-Type': 'application/json'
             },
