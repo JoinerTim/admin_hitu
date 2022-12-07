@@ -32,7 +32,7 @@ const News = () =>{
   const getData = async () => {
     const data = await dispatch(getListNews({page:1, size:10}));
     setNews(data.payload);
-}
+  }
 
 const handleDeleteNews = async (id) => {
   const config = {

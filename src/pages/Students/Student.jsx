@@ -1,55 +1,98 @@
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import "../scss/main.scss";
-import ConfirmDelete from '../Services/ConfirmDelete';
+import ConfirmDelete from "../Services/ConfirmDelete";
 import { toast } from "react-toastify";
-import axios from 'axios';
-import CreateStudent from './CreateStudent';
-import UpdateStudent from './UpdateStudent';
+import axios from "axios";
+import CreateStudent from "./CreateStudent";
+import UpdateStudent from "./UpdateStudent";
+import import_excel_svg from "../../assests/import_excel_svg.png"
 
 
 const Student = () => {
   const dispatch = useDispatch();
 
-  const [keyFresh, setKeyFresh] = useState(0)
+  const [keyFresh, setKeyFresh] = useState(0);
+  const [file, setFile] = useState();
+  const [students, setStudents] = useState([]);
 
-  const [students, setStudents] = useState([])
+  const [updateShow, setUpdateShow] = useState(false);
+  const [createShow, setCreateShow] = useState(false);
 
-  const [updateShow, setUpdateShow] = useState(false)
-  const [createShow, setCreateShow] = useState(false)
+  const [deleteShow, setDeleteShow] = useState(false);
 
-  const [deleteShow, setDeleteShow] = useState(false)
-
-  const [userId, setUserId] = useState(null)
-  const [rowId, setRowId] = useState(null)
-
+  const [userId, setUserId] = useState(null);
+  const [rowId, setRowId] = useState(null);
 
   const getData = async () => {
     const config = {
-        headers: {
-          "Authorization" : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`
-        },
-      };
-        const {data: {data}} = await axios.get("http://18.140.66.234/api/v1/students/page?page=1&size=30", config)
-        setStudents(data)
-    }
+      headers: {
+        Authorization: `Bearer ${JSON.parse(
+          localStorage.getItem("accessToken")
+        )}`,
+      },
+    };
+    const {
+      data: { data },
+    } = await axios.get(
+      "http://18.140.66.234/api/v1/students/page?page=1&size=30",
+      config
+    );
+    setStudents(data);
+  };
 
   useEffect(() => {
     getData();
   }, [keyFresh]);
 
-  const handleCreate = () => {
-    setCreateShow(true)
-  }
+  const handleCreate = async () => {
+    if(!file) {
+      setCreateShow(true);
+    } else {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${JSON.parse(
+            localStorage.getItem("accessToken")
+          )}`,
+        },
+      };
+  
+      var bodyFormData = new FormData();
+      bodyFormData.append("file", file);
+      try {
+        await axios.post(`http://18.140.66.234/api/v1/students/upload-excel`,
+          bodyFormData,
+          config
+        );
+
+        setKeyFresh((old) => old + 1);
+        setFile({})
+        toast.success("Giáo viên được thêm thành công!");
+      } catch (err) {
+        setFile({})
+        toast.error(err.response.data.message);
+      }
+    }
+  };
 
   const handleDeleteUser = async (id) => {
     try {
-      await fetch(`http://18.140.66.234/api/v1/students/toggle-status?ids=${id}`, {method: "PUT"})
-      setKeyFresh(old => old + 1)
+      await fetch(
+        `http://18.140.66.234/api/v1/students/toggle-status?ids=${id}`,
+        { method: "PUT" }
+      );
+      setKeyFresh((old) => old + 1);
       toast.success("Sinh viên vừa được xóa thành công");
     } catch (error) {
       toast.error("Sinh viên chưa được xóa!");
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
     }
   };
 
@@ -81,7 +124,7 @@ const Student = () => {
     },
     {
       name: "Tham gia lúc",
-      selector: (row) => row.createdDate.toString().slice(0,10),
+      selector: (row) => row.createdDate.toString().slice(0, 10),
       sortable: true,
     },
     {
@@ -92,8 +135,8 @@ const Student = () => {
             className="btn-action update-handle"
             onClick={() => {
               // history(`/dashboard/update/user/${row.id}`);
-              setUpdateShow(true)
-              setUserId(row.userId)
+              setUpdateShow(true);
+              setUserId(row.userId);
             }}
           >
             Sửa
@@ -101,8 +144,8 @@ const Student = () => {
           <button
             className="btn-action delete-handle"
             onClick={() => {
-              setRowId(row.id)
-              setDeleteShow(true)
+              setRowId(row.id);
+              setDeleteShow(true);
               // handleDeleteUser(row);
             }}
           >
@@ -128,8 +171,27 @@ const Student = () => {
           selectableRowsHighlight={false}
           // onSelectedRowsChange={handleSelectedChange}
           actions={
-            <div>
-              <button className="btn flex items-center justify-center  outline-none p-[10px] w-[90px] h-[40px] bg-[#29d21a] rounded-[5px] text-white mr-[15px]" onClick={handleCreate}>
+            <div className="flex justify-center items-center">
+              <span className="text-black font-[600] text-[12px] mr-[12px]">
+                {file ? file.name : ""}
+              </span>
+              <label
+                htmlFor="file_excel"
+                className="cursor-pointer btn flex items-center justify-start  outline-none p-[10px] w-[45px] h-[40px] bg-[#fff] border-[1px] border-black rounded-[5px] text-white mr-[15px]"
+              >
+                <img className="w-[25px] " src={import_excel_svg} alt="" />
+                <input
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file_excel"
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                />
+              </label>
+              <button
+                className="btn flex items-center justify-center  outline-none p-[10px] w-[90px] h-[40px] bg-[#29d21a] rounded-[5px] text-white mr-[15px]"
+                onClick={handleCreate}
+              >
                 Tạo
               </button>
             </div>
@@ -138,12 +200,29 @@ const Student = () => {
         />
         // </DataTableExtensions>
       }
-      <UpdateStudent updateShow={updateShow} setUpdateShow={setUpdateShow} userId={userId} setUserId={setUserId} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
-      <CreateStudent createShow={createShow} setCreateShow={setCreateShow} keyFresh={keyFresh} setKeyFresh={setKeyFresh}/>
-      <ConfirmDelete onClick={() => {handleDeleteUser(rowId)}} deleteShow={deleteShow} setDeleteShow={setDeleteShow} />
+      <UpdateStudent
+        updateShow={updateShow}
+        setUpdateShow={setUpdateShow}
+        userId={userId}
+        setUserId={setUserId}
+        keyFresh={keyFresh}
+        setKeyFresh={setKeyFresh}
+      />
+      <CreateStudent
+        createShow={createShow}
+        setCreateShow={setCreateShow}
+        keyFresh={keyFresh}
+        setKeyFresh={setKeyFresh}
+      />
+      <ConfirmDelete
+        onClick={() => {
+          handleDeleteUser(rowId);
+        }}
+        deleteShow={deleteShow}
+        setDeleteShow={setDeleteShow}
+      />
     </div>
   );
 };
-
 
 export default Student;

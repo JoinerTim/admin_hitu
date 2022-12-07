@@ -7,13 +7,15 @@ import UpdateCustomer from './UpdateTeacher';
 import ConfirmDelete from '../Services/ConfirmDelete';
 import CreateCustomer from './CreateTeacher';
 import { toast } from "react-toastify";
+import import_excel_svg from "../../assests/import_excel_svg.png"
+import axios from 'axios';
 
 
 const Teachers = () => {
   const dispatch = useDispatch();
 
   const {data: users} = useSelector(state => state.userState)
-
+  const [file, setFile] = useState();
 
   const [keyFresh, setKeyFresh] = useState(0)
 
@@ -34,8 +36,36 @@ const Teachers = () => {
     getData();
   }, [keyFresh]);
 
-  const handleCreate = () => {
-    setCreateShow(true)
+  const handleCreate =async () => {
+    if(!file) {
+      setCreateShow(true)
+    } else {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${JSON.parse(
+            localStorage.getItem("accessToken")
+          )}`,
+        },
+      };
+  
+      var bodyFormData = new FormData();
+      bodyFormData.append("file", file);
+      try {
+        await axios.post(`http://18.140.66.234/api/v1/teachers/upload-excel`,
+          bodyFormData,
+          config
+        );
+
+        setKeyFresh((old) => old + 1);
+        setFile({})
+        toast.success("Giáo viên được thêm thành công!");
+      } catch (err) {
+        setFile({})
+        toast.error(err.response.data.message);
+      }
+    }
+
   }
 
   const handleDeleteUser = async (id) => {
@@ -47,6 +77,13 @@ const Teachers = () => {
       toast.error("Người dùng chưa được xóa!");
     }
   };
+
+  const handleFileChange = (e) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
+  };
+  
 
   const columns = [
     {
@@ -123,7 +160,12 @@ const Teachers = () => {
           selectableRowsHighlight={false}
           // onSelectedRowsChange={handleSelectedChange}
           actions={
-            <div>
+            <div className='flex justify-center items-center'>
+              <span className='text-black font-[600] text-[12px] mr-[12px]'>{file ? file.name: ""}</span>
+              <label htmlFor="file_excel" className='cursor-pointer btn flex items-center justify-start  outline-none p-[10px] w-[45px] h-[40px] bg-[#fff] border-[1px] border-black rounded-[5px] text-white mr-[15px]'>
+                <img className='w-[25px] ' src={import_excel_svg} alt="" />
+                <input onChange={handleFileChange} className='hidden' id='file_excel' type="file" accept=".xlsx,.xls,.csv" />
+              </label>
               <button className="btn flex items-center justify-center  outline-none p-[10px] w-[90px] h-[40px] bg-[#29d21a] rounded-[5px] text-white mr-[15px]" onClick={handleCreate}>
                 Tạo
               </button>
