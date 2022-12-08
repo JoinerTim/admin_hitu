@@ -9,5 +9,9 @@ export { default as Student } from './Students/Student';
 export { default as News } from './News/News';
 export { default as Faculty } from './Faculty/Faculty';
 
+export {default as EducationProgram} from "./EducationProgram/EducationProgram";
+export {default as EducationProgramSubject} from "./EducationProgram/EducationProgramSubject";
+
+
 
 

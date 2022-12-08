@@ -9,7 +9,9 @@ import {
   Notification,
   Student,
   NavbarMain,
-  Faculty
+  Faculty,
+  EducationProgram,
+  EducationProgramSubject
 } from "./pages";
 import "./App.css";
 
@@ -56,6 +58,12 @@ const App = () => {
                   <Route path="/News" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <News /> </ProtectedRoute>} />
                   <Route path="/Notification" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Notification /> </ProtectedRoute>} />
                   <Route path="/faculty" element={<ProtectedRoute isAuthenticated={isAuthenticated}> <Faculty /> </ProtectedRoute>} />
+                  <Route path="/education-program"element={<ProtectedRoute isAuthenticated={isAuthenticated}><EducationProgram />{" "}</ProtectedRoute>}/>
+                  <Route path="/education-program/:id"
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}>
+                      <EducationProgramSubject />{" "}
+                    </ProtectedRoute>}/>
+                      
                   <Route path="/login" element={<Login />} />
                 </Routes>
             </div>

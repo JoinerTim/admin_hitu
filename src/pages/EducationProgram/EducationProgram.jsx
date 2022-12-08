@@ -1,61 +1,69 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import FacultyAPI from "../../API/FacultyAPI";
+import { Link } from "react-router-dom";
+
 import { toast } from "react-toastify";
-import FormFaculty from "./FormFaculty";
+import EducationProgramAPI from "../../API/EducationProgramAPI";
+import FormEducationProgram from "./FormEducationProgram";
+import s from "./Table.module.css";
 import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
 import ReactLoading from "react-loading";
 
-const Faculty = () => {
-
+const EducationProgram = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [rowId, setRowId] = useState(null);
   const [code, setCode] = useState(null);
   const [view, setView] = useState("");
-  const [keyFresh, setKeyFresh] = useState(0)
   useEffect(() => {
     setLoading(true);
-    FacultyAPI.getPageFaculty({ page: 1 })
+
+    EducationProgramAPI.getPage({ page: 1 })
       .then(({ data }) => {
         setTimeout(() => {
-      setLoading(false);
-    }, 375)
+          setLoading(false);
+        }, 375)
         setData(data.data);
       })
       .catch((e) => {
-        toast.error("Có lỗi xảy ra");
+        toast.error(e.response.data.message);
       });
-  }, [keyFresh]);
+  }, []);
   const handleDelete = async (ids) => {
     try {
-      await FacultyAPI.hiddenFaculty(ids);
-      setKeyFresh(old => old + 1)
+      await EducationProgramAPI.hidden(ids);
+      setData((d) => d.filter((e) => e.id !== ids));
       toast.success("Xoá thành công");
     } catch (error) {
-      toast.error("Xoá khoa thất bại");
+      toast.error(error.response.data.message);
     }
   };
   const columns = [
     {
-      name: "Mã khoa",
+      name: "Mã chương trình",
       selector: (row) => row.code,
       sortable: true,
       width: "200px",
     },
     {
-      name: "Tên khoa",
+      name: "Tên chương trình",
       selector: (row) => row.name,
       sortable: true,
-      width: "300px",
+      width: "400px",
     },
     {
       name: "Chức Năng",
       selector: (row) => (
         <div className="action--item flex items-center justify-center relative">
+          <Link
+            className="p-2 hover:scale-110  hover:underline hover:text-blue-800 text-blue-500"
+            to={"/education-program/" + row.code}
+          >
+            Xem môn học
+          </Link>
           <button
-            className="btn-action update-handle hover:scale-110 !bg-green-700 !font-medium !text-white"
+            className={s.btnEdit}
             onClick={() => {
               setRowId(row.id);
               setCode(row.code);
@@ -65,7 +73,7 @@ const Faculty = () => {
             Sửa
           </button>
           <button
-            className="btn-action delete-handle !font-medium hover:scale-110 !text-white !text-md"
+            className={s.btnDelete}
             onClick={() => {
               handleDelete(row.id);
             }}
@@ -78,9 +86,8 @@ const Faculty = () => {
   ];
   return (
     <div className="rounded-lg shadow-md col l-10 m-[30px_50px]">
-      {!loading && 
-      <DataTable
-        title="Danh sách khoa"
+      {!loading && <DataTable
+        title="Danh sách chương trình học"
         columns={columns}
         data={data}
         pagination
@@ -89,21 +96,21 @@ const Faculty = () => {
         actions={
           <div>
             <button
-              className="btn  flex !font-medium !text-xl !items-center justify-center  outline-none p-[10px] w-[90px] h-[40px] bg-[#29d21a] rounded-[5px] text-white mr-[15px]"
+              className={s.btnAdd}
               onClick={() => {
                 setView("ADD");
                 setCode(null);
                 setRowId(null);
               }}
             >
-              Tạo
+              Tạo chương trình
             </button>
           </div>
         }
         dense
       />}
       {view && (
-        <FormFaculty
+        <FormEducationProgram
           code={code}
           id={rowId}
           setView={setView}
@@ -134,4 +141,4 @@ const Faculty = () => {
   );
 };
 
-export default Faculty;
+export default EducationProgram;
