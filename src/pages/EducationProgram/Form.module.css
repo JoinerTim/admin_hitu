@@ -5,7 +5,7 @@
     @apply flex space-x-8 w-full py-4 px-8;
   }
   .field {
-    @apply flex flex-col w-full;
+    @apply flex flex-col  w-[369px];
   }
   .select {
     @apply w-full;
